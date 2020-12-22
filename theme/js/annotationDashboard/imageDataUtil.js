@@ -1,5 +1,3 @@
-import * as d3 from 'd3';
-
 export const endDrawTime = 84;
 
 export const colorDictionary = {
