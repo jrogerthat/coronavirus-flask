@@ -1,5 +1,7 @@
 import * as d3 from 'd3';
 
+export const endDrawTime = 84;
+
 export const colorDictionary = {
   'blue': {'code':[0, 0, 255], 'structure': ['Cell Membrane']},
   'purple':{'code':[102, 0, 204], 'structure': ['ACE2']},
@@ -77,7 +79,13 @@ export async function loadPngForFrame(){
 }
   
 export function drawFrameOnPause(video) {
-  let imgObj = loadPngForFrame();
+  
+  if(video.currentTime < endDrawTime){
+    let imgObj = loadPngForFrame();
+  }else{
+    console.log('credits are playing');
+  }
+  
 }
 
 export function colorChecker(code){

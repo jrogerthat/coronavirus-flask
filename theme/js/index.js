@@ -13,6 +13,7 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 import { fab } from '@fortawesome/free-brands-svg-icons'
+import { renderTimeline } from './annotationDashboard/timeline';
 
 library.add(faCheck, fas, far, fab) 
 dom.i2svg() 
@@ -41,7 +42,6 @@ async function init(){
 
           // // create a tooltip
     var tooltipTest = d3.select('#main').select('div.tooltip');
-    
     var tooltip = tooltipTest.empty() ? d3.select('#main').append('div').classed('tooltip', true): tooltipTest;
     
     tooltip.style("opacity", 0)
@@ -55,6 +55,7 @@ async function init(){
     d3.select('.add-comment').select('button').on('click', (event, d)=> addCommentButton(d, event));
     d3.select('#toggle').select('input').on('click', (event)=> toggleSort(event));
    
+    renderTimeline(d3.select('#main'));
     
 }
 

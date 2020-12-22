@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { annotationData } from '..';
 import { dataKeeper, formatAnnotationTime, formatTime } from '../dataManager';
 import { addStructureLabelFromButton, removeStructureLabelFromButton, goBackButton } from './topbar'
-import { clearCanvas, colorDictionary, currentImageData, drawFrameOnPause, getCoordColor, makeNewImageData, parseArray } from './imageDataUtil';
+import { clearCanvas, colorDictionary, currentImageData, drawFrameOnPause, endDrawTime, getCoordColor, makeNewImageData, parseArray } from './imageDataUtil';
 import { drawCommentBoxes, formatCommentData, updateCommentSidebar, clearRightSidebar } from './commentBar';
 import { updateAnnotationSidebar } from './annotationBar';
 
@@ -125,7 +125,7 @@ export function togglePlay() {
 export async function mouseMoveVideo(coord, video){
   if(video.playing){
     console.log('videoPlaying');
-  }else if(structureClicked){
+  }else if(structureClicked || video.currentTime >= endDrawTime){
     console.log('what this do');
   }else{
 
