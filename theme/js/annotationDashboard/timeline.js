@@ -33,7 +33,7 @@ export function renderTimeline(div){
 }
 
 export function highlightTimelineBars(timeRange){
-    //d3.selectAll('.current').classed('current', false);
+   
     d3.select('.timeline-wrap').selectAll('.anno')
         .filter(f=> (f.seconds[0] >= timeRange[0] && f.seconds[0] <= timeRange[1]) || (f.seconds[1] <= timeRange[1] && f.seconds[1] >= timeRange[0]))
         .classed('current', true);

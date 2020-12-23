@@ -3,7 +3,7 @@ import { annotationData } from '..';
 import { dataKeeper, formatAnnotationTime, formatTime } from '../dataManager';
 import { addStructureLabelFromButton, removeStructureLabelFromButton, goBackButton } from './topbar'
 import { clearCanvas, colorDictionary, currentImageData, drawFrameOnPause, endDrawTime, getCoordColor, makeNewImageData, parseArray } from './imageDataUtil';
-import { drawCommentBoxes, formatCommentData, updateCommentSidebar, clearRightSidebar } from './commentBar';
+import { drawCommentBoxes, formatCommentData, updateCommentSidebar, clearRightSidebar, highlightCommentBoxes } from './commentBar';
 import { updateAnnotationSidebar } from './annotationBar';
 import { highlightTimelineBars } from './timeline';
 import firebase from 'firebase/app';
@@ -276,7 +276,6 @@ function structureTooltip(structureData, coord, snip, hoverBool){
 export async function videoUpdates(data, annoType){
 
   const storageRef = firebase.storage().ref();
-  //var storageRef = storage.ref();
   let doods = await storageRef.child('images/').listAll();
  
   let svgTest = d3.select('#interaction').select('svg')
@@ -284,7 +283,7 @@ export async function videoUpdates(data, annoType){
   
   const video = document.querySelector('video');
 
-  let vidDim = d3.select('video').node().getBoundingClientRect();
+  let vidDim = video.getBoundingClientRect();
    
   let interDIV = d3.select('#interaction');
 
@@ -296,18 +295,18 @@ export async function videoUpdates(data, annoType){
 
   video.ontimeupdate = async (event) => {
 
-    let timeRange = [video.currentTime - 1, video.currentTime + 1];
+    let timeRange = [video.currentTime < 1.5 ? 0 : Math.floor(video.currentTime - 1.5), video.currentTime + 1.5];
 
     highlightTimelineBars(timeRange);
  
    // updateAnnotationSidebar(data, annoType, video.currentTime);
  
-   
+   /*
+    COMMENT MANIPULATION HERE
+   */
+    let commentData = Object.entries(dataKeeper[dataKeeper.length - 1].comments).map(m=> m[1]);
  
-    ///END ANNOTATION
-    let annotations = d3.entries(dataKeeper[dataKeeper.length - 1].annotations).map(m=> m.value);
- 
-    let annoTest = annotations.filter((f,i)=> {
+    let annoTest = commentData.filter((f,i)=> {
         let time = JSON.parse(f.videoTime)
         if(time.length > 1){
             return time[0] <= video.currentTime && time[1] >= video.currentTime;
@@ -317,13 +316,10 @@ export async function videoUpdates(data, annoType){
     });
  
     let memoCirc = d3.select('#annotation-layer').selectAll('.memo');
-    let memoDivs = d3.select('#comment-sidebar').select('#annotation-wrap').selectAll('.memo');
- 
     memoCirc.classed('selected', false);
-    memoDivs.classed('selected', false);
- 
     let filtered = memoCirc.filter(f=> f.videoTime < timeRange[1] && f.videoTime > timeRange[0]).classed('selected', true);
-    let selectedMemoDivs = memoDivs.filter(f=> f.videoTime < timeRange[1] && f.videoTime > timeRange[0]).classed('selected', true);
+
+    highlightCommentBoxes(timeRange);
    
     let filteredPushes = filtered.filter(f=> {
         return f.commentMark === 'push';
@@ -345,7 +341,7 @@ export async function videoUpdates(data, annoType){
         return urlDood;
     });
  
-    if(d3.select('.show-comments').select('.form-check').select('.form-check-input').node().checked){
+    //if(d3.select('.show-comments').select('.form-check').select('.form-check-input').node().checked){
        
         let images = interDIV.selectAll('.doodles').data(await Promise.all(test)).join('img').classed('doodles', true);
         images.attr('src', d=> d);
@@ -367,24 +363,20 @@ export async function videoUpdates(data, annoType){
  
         circ.on('mouseover', (d)=>{
  
-            let wrap = d3.select('#comment-sidebar').select('#annotation-wrap');
+            let wrap = d3.select('#right-sidebar').select('#comment-wrap');
             let memoDivs = wrap.selectAll('.memo').filter(f=> f.key === d.key);
             memoDivs.classed('selected', true);
             memoDivs.nodes()[0].scrollIntoView({behavior: "smooth"});
  
         }).on('mouseout', (d)=> {
  
-            let wrap = d3.select('#comment-sidebar').select('#annotation-wrap');
+            let wrap = d3.select('#right-sidebar').select('#annotation-wrap');
             let memoDivs = wrap.selectAll('.memo').classed('selected', false);
             
         });
  
        // d3.select('#comment-sidebar').select('#annotation-wrap').node().scrollTop -= 60;
- 
-        if(!selectedMemoDivs.empty()){
-            selectedMemoDivs.nodes()[0].scrollIntoView();
-        }
- 
+
         let annotationGroup = svg.selectAll('g.annotations').data(annoTest).join('g').classed('annotations', true);
         let annotationMark = annotationGroup.filter(f=> f.commentMark === 'push').selectAll('circle').data(d=> [d]).join('circle').attr('r', 5).attr('cx', d=> d.posLeft).attr('cy',d=>  d.posTop);
         let annotationText = annotationGroup.selectAll('text').data(d=> [d]).join('text')
@@ -405,6 +397,6 @@ export async function videoUpdates(data, annoType){
                  return '50px'
              }
         });            
-    }
- };
+  //  }
+  };
  }

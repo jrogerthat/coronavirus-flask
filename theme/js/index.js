@@ -39,7 +39,6 @@ async function init(){
     checkUser([renderUser]);
     updateAnnotationSidebar(anno, null, null);
     formatVidPlayer(true);
-    //updateVideoAnn();
     videoUpdates();
 
           // // create a tooltip
