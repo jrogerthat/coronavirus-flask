@@ -7,6 +7,8 @@ import { drawCommentBoxes, formatCommentData, updateCommentSidebar, clearRightSi
 import { updateAnnotationSidebar } from './annotationBar';
 import { highlightTimelineBars } from './timeline';
 import firebase from 'firebase/app';
+//import firebase from 'firebase';
+import 'firebase/storage';
 
 let canPlay;
 let structureClicked = false;
@@ -276,8 +278,8 @@ function structureTooltip(structureData, coord, snip, hoverBool){
 }
 export async function videoUpdates(data, annoType){
 
-  var storage = firebase.storage();
-  var storageRef = storage.ref();
+  const storageRef = firebase.storage().ref();
+  //var storageRef = storage.ref();
   let doods = await storageRef.child('images/').listAll();
  
   let svgTest = d3.select('#interaction').select('svg')
