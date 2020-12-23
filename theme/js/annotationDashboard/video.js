@@ -114,7 +114,6 @@ export function playButtonChange(){
 export function togglePlay() {
   playButtonChange();
   if (video.playing) {
-    console.log('is this  doing it twice');
     video.pause();
     drawFrameOnPause(video);
   } else {
@@ -126,7 +125,7 @@ export function togglePlay() {
 
 export async function mouseMoveVideo(coord, video){
   if(video.playing){
-    console.log('videoPlaying');
+    console.log('video playing');
   }else if(structureClicked || video.currentTime >= endDrawTime){
     console.log('what this do');
   }else{
@@ -137,7 +136,6 @@ export async function mouseMoveVideo(coord, video){
       currentColorCodes.push(snip);
       parseArray(snip);
       let structFromDict =  snip === 'orange' && video.currentTime < 17 ? colorDictionary[snip].structure[1].toUpperCase() :  colorDictionary[snip].structure[0].toUpperCase();
-      console.log('structure from dict',structFromDict)
       let structureData =  annotationData[annotationData.length - 1].filter(f=> {
         return f.associated_structures.split(', ').map(m=> m.toUpperCase()).indexOf(structFromDict) > -1;
       });
@@ -159,7 +157,6 @@ export async function mouseClickVideo(coord, video){
   }else{ 
     
     let snip = getCoordColor(coord);
-    console.log('snip', snip);
 
     if(snip === "black" || snip === "unknown"){
       structureClicked = false;
@@ -300,12 +297,12 @@ export async function videoUpdates(data, annoType){
   video.ontimeupdate = async (event) => {
 
     let timeRange = [video.currentTime - 1, video.currentTime + 1];
- 
-    console.log('video time wortking??');
- 
-    updateAnnotationSidebar(data, annoType, video.currentTime);
- 
+
     highlightTimelineBars(timeRange);
+ 
+   // updateAnnotationSidebar(data, annoType, video.currentTime);
+ 
+   
  
     ///END ANNOTATION
     let annotations = d3.entries(dataKeeper[dataKeeper.length - 1].annotations).map(m=> m.value);
