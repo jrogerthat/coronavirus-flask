@@ -143,6 +143,15 @@ font-size: 12px;
 margin-top:10px;
 }
 
+.anno.current rect{
+  opacity: 1;
+
+}
+
+.anno rect{
+  opacity: 0.3;
+}
+
 .anno .header-anno{
   position:relative;
   top:0;
@@ -196,9 +205,6 @@ margin-top:10px;
  .memo.question{
   border: 1px solid red !important;
  }
- 
- 
- 
  .memo .tag-span{
    display:inline-block;
  }

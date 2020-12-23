@@ -5,7 +5,7 @@ const { checkUser, pullDataFromDatabase } = require("./firebaseUtil");
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 import * as d3 from 'd3';
-import { formatVidPlayer } from './annotationDashboard/video';
+import { formatVidPlayer, videoUpdates } from './annotationDashboard/video';
 import { updateAnnotationSidebar } from './annotationDashboard/annotationBar';
 
 import { library, dom } from "@fortawesome/fontawesome-svg-core";
@@ -39,6 +39,8 @@ async function init(){
     checkUser([renderUser]);
     updateAnnotationSidebar(anno, null, null);
     formatVidPlayer(true);
+    //updateVideoAnn();
+    videoUpdates();
 
           // // create a tooltip
     var tooltipTest = d3.select('#main').select('div.tooltip');

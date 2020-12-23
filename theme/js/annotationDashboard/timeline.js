@@ -27,5 +27,12 @@ export function renderTimeline(div){
             return `translate(${xScale(d.seconds[0])} 0)`;
         }
     });
-    rects.style('opacity', 0.3);
+    //rects.style('opacity', 0.3);
+
+    annos.on('mouseover', (target, d)=> console.log('ddd', d));
+}
+
+export function highlightTimelineBars(timeRange){
+    console.log('timerange????',timeRange);
+    d3.select('.timeline-wrap').selectAll('.anno').filter(f=> f.seconds[0] >= timeRange[0] || f.seconds[1] <= timeRange[1]).classed('current', true);
 }
