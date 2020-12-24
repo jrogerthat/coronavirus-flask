@@ -4,6 +4,7 @@ require('firebase/database');
 import { currentUser, dataKeeper } from './dataManager';
 import { fbConfig } from '.';
 import { updateCommentSidebar } from './annotationDashboard/commentBar';
+import { renderTimeline } from './annotationDashboard/timeline';
 
 
 export async function checkUser(callbackArray){
@@ -18,7 +19,7 @@ export async function checkUser(callbackArray){
       callbackArray.forEach(fun=> {
         fun(user);
       });
-      checkDatabase([updateCommentSidebar])
+      checkDatabase([updateCommentSidebar, renderTimeline])
           // User is signed in.
     } else {
       console.log("NO USER", user);
