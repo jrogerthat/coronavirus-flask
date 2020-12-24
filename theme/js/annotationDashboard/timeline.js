@@ -29,7 +29,9 @@ export function renderTimeline(div){
     });
    
 
-    annos.on('mouseover', (target, d)=> console.log('ddd', d));
+    annos.on('mouseover', (event, d)=> timelineMouseover(event, d))
+        .on('mouseout', (event, d)=> timelineMouseout(event, d));
+   
 }
 
 export function highlightTimelineBars(timeRange){
@@ -41,4 +43,12 @@ export function highlightTimelineBars(timeRange){
     d3.select('.timeline-wrap').selectAll('.anno')
         .filter(f=> f.seconds[1] < timeRange[0] || f.seconds[0] > timeRange[1])
         .classed('current', false);
+}
+
+export function timelineMouseover(event, d){
+    d3.select(event.target.parentNode).classed('current-hover', true);
+}
+
+export function timelineMouseout(event, d){
+    d3.select(event.target.parentNode).classed('current-hover', false);
 }

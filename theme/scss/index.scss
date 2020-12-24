@@ -146,6 +146,11 @@ margin-top:10px;
 .anno.current rect{
   opacity: 1;
 }
+.anno.current-hover rect,
+.anno.current.current-hover rect{
+  opacity:.8;
+  fill:orange;
+}
 
 .anno rect{
   opacity: 0.3;
