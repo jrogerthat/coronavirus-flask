@@ -24,7 +24,7 @@ export function clearAnnotationSidebar(){
     annoWrap.select('.anno-wrap').selectAll('*').remove();
 }
 
-export async function updateAnnotationSidebar(data, stackedData, videoTime){
+export async function updateAnnotationSidebar(data, stackedData){
 
     let annoType = annoTypes();
     ///start drawing annotation 

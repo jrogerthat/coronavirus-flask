@@ -88,21 +88,15 @@ export function formatCommentData(dbRef, annotations){
         let nestReplies = annotations.map((d, i, n)=>{
         return recurse(d, replyData, 0);
         });
-        
         return nestReplies;
-
     }
-
-
 }
 
 export function highlightCommentBoxes(timeRange){
-
     let memoDivs = d3.select('#right-sidebar').select('#comment-wrap').selectAll('.memo');
     memoDivs.classed('selected', false);
     let selectedMemoDivs = memoDivs.filter(f=> {
         return f.videoTime <= timeRange[1] && f.videoTime >= timeRange[0]}).classed('selected', true);
-    console.log(selectedMemoDivs.nodes()[0]);
     if(!selectedMemoDivs.empty()){
         selectedMemoDivs.nodes()[0].scrollIntoView({behavior: "smooth"});
     }

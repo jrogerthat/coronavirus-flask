@@ -298,8 +298,13 @@ export async function videoUpdates(data, annoType){
     let timeRange = [video.currentTime < 1.5 ? 0 : Math.floor(video.currentTime - 1.5), video.currentTime + 1.5];
 
     highlightTimelineBars(timeRange);
- 
-   // updateAnnotationSidebar(data, annoType, video.currentTime);
+
+    //console.log(annotationData)
+
+    let filteredData = annotationData[annotationData.length - 1]
+        .filter(f=> f.seconds[0] <= timeRange[0] && f.seconds[0] <= timeRange[1]) || (f.seconds[1] <= timeRange[1] && f.seconds[1] >= timeRange[0]);
+    console.log('filtered data',filteredData);
+    updateAnnotationSidebar(filteredData, null);
  
    /*
     COMMENT MANIPULATION HERE
