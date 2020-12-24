@@ -4,7 +4,7 @@ import { dataKeeper, formatAnnotationTime, formatTime } from '../dataManager';
 import { addStructureLabelFromButton, removeStructureLabelFromButton, goBackButton } from './topbar'
 import { clearCanvas, colorDictionary, currentImageData, drawFrameOnPause, endDrawTime, getCoordColor, makeNewImageData, parseArray } from './imageDataUtil';
 import { drawCommentBoxes, formatCommentData, updateCommentSidebar, clearRightSidebar, highlightCommentBoxes } from './commentBar';
-import { updateAnnotationSidebar } from './annotationBar';
+import { highlightAnnotationbar, updateAnnotationSidebar } from './annotationBar';
 import { highlightTimelineBars } from './timeline';
 import firebase from 'firebase/app';
 //import firebase from 'firebase';
@@ -299,12 +299,11 @@ export async function videoUpdates(data, annoType){
 
     highlightTimelineBars(timeRange);
 
-    //console.log(annotationData)
-
     let filteredData = annotationData[annotationData.length - 1]
         .filter(f=> f.seconds[0] <= timeRange[0] && f.seconds[0] <= timeRange[1]) || (f.seconds[1] <= timeRange[1] && f.seconds[1] >= timeRange[0]);
-    console.log('filtered data',filteredData);
+    
     updateAnnotationSidebar(filteredData, null);
+    highlightAnnotationbar(video.currentTime);
  
    /*
     COMMENT MANIPULATION HERE
@@ -319,12 +318,14 @@ export async function videoUpdates(data, annoType){
             return time[0] < timeRange[1] && time[0] > timeRange[0];
         }
     });
+
+    highlightCommentBoxes(timeRange);
  
     let memoCirc = d3.select('#annotation-layer').selectAll('.memo');
     memoCirc.classed('selected', false);
     let filtered = memoCirc.filter(f=> f.videoTime < timeRange[1] && f.videoTime > timeRange[0]).classed('selected', true);
 
-    highlightCommentBoxes(timeRange);
+  
    
     let filteredPushes = filtered.filter(f=> {
         return f.commentMark === 'push';

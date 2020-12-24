@@ -78,3 +78,13 @@ export async function updateAnnotationSidebar(data, stackedData){
     if(stackedData != null) annoDiv.style('opacity', 0.3);
 
 }
+
+export function highlightAnnotationbar(currentTime){
+
+    let annos = d3.selectAll('#left-sidebar').select('.anno-wrap').selectAll('div.anno');
+    let test = Array.from(new Set(annos.data().map(m=> m.seconds[0]))).filter(f=> f <= currentTime);
+
+    console.log(test[test.length - 1]);
+    let selectedAnno = annos.filter(f=> f.seconds[0] == test[test.length - 1]).classed('selected', true);
+    selectedAnno.nodes()[0].scrollIntoView({behavior: "smooth"});
+}
