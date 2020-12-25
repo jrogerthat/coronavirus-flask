@@ -84,14 +84,15 @@ export function highlightTimelineBars(timeRange){
 
 export function commentBinTimelineMouseover(event, d){
     d3.select(event.target.parentNode).classed('current-hover', true);
-    let comments = d3.select('#right-sidebar').select('#comment-wrap').selectAll('.memo');
-    let filComm = comments.filter(f=> d.data.map(m=> m.key).indexOf(f.key) > -1);
-    filComm.classed('selected', true);
-    filComm.nodes()[0].scrollIntoView({behavior: "smooth"});
-    
+    if(d.data.length > 0){
+        let comments = d3.select('#right-sidebar').select('#comment-wrap').selectAll('.memo');
+        let filComm = comments.filter(f=> d.data.map(m=> m.key).indexOf(f.key) > -1);
+        filComm.classed('selected', true);
+        filComm.nodes()[0].scrollIntoView({behavior: "smooth"});
+    }
 }
 
-export function commentBinTimelineMouseout(even, d){
+export function commentBinTimelineMouseout(event, d){
     d3.select(event.target.parentNode).classed('current-hover', false);
     let comments = d3.select('#right-sidebar').select('#comment-wrap').selectAll('.memo');
     comments.filter(f=> d.data.map(m=> m.key).indexOf(f.key) > -1).classed('selected', false);
@@ -99,8 +100,11 @@ export function commentBinTimelineMouseout(even, d){
 
 export function timelineMouseover(event, d){
     d3.select(event.target.parentNode).classed('current-hover', true);
+    let filAnn = d3.select('#left-sidebar').selectAll('.anno').filter(f=> f.index === d.index).classed('selected', true);
+    filAnn.nodes()[0].scrollIntoView({behavior: "smooth"});
 }
 
 export function timelineMouseout(event, d){
     d3.select(event.target.parentNode).classed('current-hover', false);
+    d3.select('#left-sidebar').selectAll('.anno').filter(f=> f.index === d.index).classed('selected', false);
 }
