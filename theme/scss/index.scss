@@ -147,8 +147,16 @@ margin-top:10px;
   opacity: 1;
 }
 
+.comm-bin.current-hover rect,
+.comm-bin.current.current-hover rect{
+  fill-opacity:.8 !important;
+  fill:orange;
+}
+
 .anno.current-hover rect,
-.anno.current.current-hover rect{
+.anno.current.current-hover rect,
+.comm-bin.current-hover rect,
+.comm-bin.current.current-hover rect{
   opacity:.8;
   fill:orange;
 }

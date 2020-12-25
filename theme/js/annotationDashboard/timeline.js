@@ -38,6 +38,9 @@ export function renderTimeline(commentData){
    // commentBinRect.style('border', '1px solid gray'); //border: 1px solid gray;
     commentBinRect.style('fill-opacity', (d, i)=> binScale(d.data.length));
 
+    comBins.on('mouseover', (event, d)=> commentBinTimelineMouseover(event, d));
+    comBins.on('mouseout', (event, d)=> commentBinTimelineMouseout(event, d));
+
    let test = commentBins.map((m, i)=> m.data.length);
    console.log(d3.max(test));
     
@@ -75,6 +78,14 @@ export function highlightTimelineBars(timeRange){
     d3.select('.timeline-wrap').selectAll('.anno')
         .filter(f=> f.seconds[1] < timeRange[0] || f.seconds[0] > timeRange[1])
         .classed('current', false);
+}
+
+export function commentBinTimelineMouseover(event, d){
+    d3.select(event.target.parentNode).classed('current-hover', true);
+}
+
+export function commentBinTimelineMouseout(even, d){
+    d3.select(event.target.parentNode).classed('current-hover', false);
 }
 
 export function timelineMouseover(event, d){
