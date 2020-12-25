@@ -15,7 +15,9 @@ export function renderTimeline(commentData){
     timelineWrap.style('top', (560 + 60) + "px");
     let timeSVG = timelineWrap.append('svg');
     timeSVG.style('width', (960) + "px");
-    let comments = Object.entries(commentData.comments).map(m=> m[1]);
+    let comments = Object.entries(commentData.comments).map(m=> {
+        m[1].key = m[0];
+        return m[1]});
 
     function binThings(){
         let binCount = 90 / 5;
@@ -35,7 +37,7 @@ export function renderTimeline(commentData){
     comBins.attr('transform', (d, i)=> `translate(${xScale((i*5))} 2)`);
     let commentBinRect = comBins.selectAll('rect').data(d=> [d]).join('rect');
     commentBinRect.attr('height', 10).attr('width', 40);
-   // commentBinRect.style('border', '1px solid gray'); //border: 1px solid gray;
+ 
     commentBinRect.style('fill-opacity', (d, i)=> binScale(d.data.length));
 
     comBins.on('mouseover', (event, d)=> commentBinTimelineMouseover(event, d));
@@ -82,10 +84,17 @@ export function highlightTimelineBars(timeRange){
 
 export function commentBinTimelineMouseover(event, d){
     d3.select(event.target.parentNode).classed('current-hover', true);
+    let comments = d3.select('#right-sidebar').select('#comment-wrap').selectAll('.memo');
+    let filComm = comments.filter(f=> d.data.map(m=> m.key).indexOf(f.key) > -1);
+    filComm.classed('selected', true);
+    filComm.nodes()[0].scrollIntoView({behavior: "smooth"});
+    
 }
 
 export function commentBinTimelineMouseout(even, d){
     d3.select(event.target.parentNode).classed('current-hover', false);
+    let comments = d3.select('#right-sidebar').select('#comment-wrap').selectAll('.memo');
+    comments.filter(f=> d.data.map(m=> m.key).indexOf(f.key) > -1).classed('selected', false);
 }
 
 export function timelineMouseover(event, d){
