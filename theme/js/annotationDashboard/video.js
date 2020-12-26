@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { annotationData } from '..';
 import { dataKeeper, formatAnnotationTime, formatTime } from '../dataManager';
-import { addStructureLabelFromButton, removeStructureLabelFromButton, goBackButton } from './topbar'
+import { addStructureLabelFromButton, addCommentButton, goBackButton } from './topbar'
 import { clearCanvas, colorDictionary, currentImageData, drawFrameOnPause, endDrawTime, getCoordColor, makeNewImageData, parseArray } from './imageDataUtil';
 import { drawCommentBoxes, formatCommentData, updateCommentSidebar, clearRightSidebar, highlightCommentBoxes } from './commentBar';
 import { highlightAnnotationbar, updateAnnotationSidebar } from './annotationBar';
@@ -162,7 +162,7 @@ export async function mouseClickVideo(coord, video){
       structureClicked = false;
       togglePlay();
 
-      removeStructureLabelFromButton();
+      addCommentButton();
 
       updateCommentSidebar(dataKeeper[dataKeeper.length - 1]);
       updateAnnotationSidebar(annotationData[annotationData.length - 1], null, null)

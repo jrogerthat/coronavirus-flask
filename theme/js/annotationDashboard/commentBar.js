@@ -6,21 +6,14 @@ require('firebase/auth');
 require('firebase/database');
 
 export function clearRightSidebar(){
-    d3.select('#comment-wrap').select('.top').selectAll('*').remove();
-    d3.select('#comment-wrap').select('.general-comm-wrap').selectAll('*').remove();
-    d3.select('#comment-wrap').select('.selected-comm-wrap').selectAll('*').remove();
+    d3.select('#comment-wrap').selectAll('*').remove();
   }
 
 export function updateCommentSidebar(dbRef){
 
     let wrap = d3.select('#right-sidebar').select('#comment-wrap').select(".general-comm-wrap");
-    // d3.select('#right-sidebar').select('#comment-wrap').select(".selected-comm-wrap").selectAll('*').remove();
-    // wrap.selectAll('*').remove();
-    clearRightSidebar();
-   // let formatMinute = d3.timeFormat();
 
     let nestReplies = formatCommentData(dbRef, null);
-
     drawCommentBoxes(nestReplies, wrap);
 
 }
@@ -50,8 +43,8 @@ function replyInputBox(d, i, n, user){
    // let tagButton = dropDown(inputDiv, tagOptions, 'Tag', 'tag-drop');
     let submit = inputDiv.append('button').text('Add').classed('btn btn-secondary', true);
 
-    submit.on('click',  (event)=> {
-        console.log(event);
+    submit.on('click', (event)=> {
+       
         event.stopPropagation();//user, currentTime, tag, coords, replyBool, replyTo, mark, initTag, annoBool
         let dataPush = annotationMaker(user, d3.select('video').node().currentTime, "none", null, true, d.key, "none", "none", false, false);
         let ref = firebase.database().ref("comments");               
@@ -100,6 +93,23 @@ export function highlightCommentBoxes(timeRange){
     if(!selectedMemoDivs.empty()){
         selectedMemoDivs.nodes()[0].scrollIntoView({behavior: "smooth"});
     }
+}
+
+function updateTags(node, tagWrap, tagArray){
+
+    tagArray.push(node.value);
+
+    let tags = tagWrap.selectAll('span.badge').data(tagArray).join('span').classed('badge badge-secondary', true);
+    tags.text(d=> `${d}  `);
+    let x = tags.append('text').text('X');
+    x.style('padding', '5px')
+    x.style('cursor', 'pointer');
+    x.on('click', (event, d)=> {
+        d3.select(event.target.parentNode).remove();
+        tagArray = tagArray.filter(f=> f != d);
+    });
+
+    node.value = "";
 }
 
 export function drawCommentBoxes(nestedData, wrap, selectedData){
@@ -233,12 +243,6 @@ export function recurseDraw(selectDiv){
     });
 }
 
-export function formatAnnotationBox(){
-    console.log('this is where  the annotation goes');
-
-    let annotationDiv = d3.select('#main-wrap').append('div').attr('id','annotation-ui');
-    
-}
 
 export const tagOptions = [
     {key:'question', color:'#2E86C1'}, 
@@ -249,10 +253,6 @@ export const tagOptions = [
 ];
 
 export function defaultTemplate(div){
-
-    //d3.select('.dropdown.ann-type-drop').select('button').style('color', 'black')
-
-    console.log('div',div)
 
     let currentTime = document.getElementById('video').currentTime;
 
@@ -614,7 +614,7 @@ export function formatPush(){
 }
 
 export function noMarkFormat(){
-    console.log("this is a test");
+    
 
     let canvas = d3.select('canvas').node()
     const context = canvas.getContext('2d');
@@ -627,10 +627,17 @@ export function noMarkFormat(){
     interactionDiv.selectAll('*').remove();
 }
 
+export function renderCommentDisplayStructure(){
+    let wrap = d3.select('#right-sidebar').select('#comment-wrap');
+    wrap.select('.template-wrap').remove();
+    wrap.append('div').classed('top', true);
+    wrap.append('div').classed('selected-comm-wrap', true);
+    wrap.append('div').classed('general-comm-wrap', true);
+}
+
 export function formatCommentBox(div){
 
     let dropId = 'comment-type';
-    let optionArray = ['None', 'Question', 'Suggestion', 'Critique']
 
     let templateWrap = div.append('div').classed('template-wrap', true);
 
@@ -639,7 +646,7 @@ export function formatCommentBox(div){
     let button = dropdiv.append('button');
     button.classed('btn dropbtn dropdown-toggle', true);
     button.attr('value', 'other');
-    let texting = button.text('Add Category Tag');
+    button.text('Add Category Tag');
     
     let dropContent = dropdiv.append('div').attr('id', dropId).classed('dropdown-content', true);
     dropContent.append('a').text('text').attr('font-size', 11);
@@ -687,13 +694,12 @@ export function formatCommentBox(div){
             let currentTime = document.getElementById('video').currentTime;
 
             if(form.node().value === 't2'){
-                console.log('this is a push', d3.select('#push-div'), !d3.select('#push-div').empty());
                 
                 let vidWidth =  +d3.select('#push-div').style('left').split('px')[0] / +d3.select('video').node().getBoundingClientRect().width;
                 let vidHeight =  +d3.select('#push-div').style('top').split('px')[0] / +d3.select('video').node().getBoundingClientRect().height;
 
                 let coords = !d3.select('#push-div').empty() ? [vidWidth, vidHeight] : null;
-                console.log('coords', vidWidth, vidHeight)
+               
                 let dataPush = annotationMaker(user, currentTime, tags.data().toString(), coords, false, null, 'push', button.node().value, commentType === "annotations");
                 let refCom = firebase.database().ref(commentType);                     
                 refCom.push(dataPush);
@@ -887,7 +893,7 @@ function autocomplete(inp, arr) {
             a.appendChild(b);
   
             d3.select(b).on('click', ()=> {
-              console.log('click!!');
+              
               updateTags(d3.select('#tag-input').node(), d3.select('.tag-wrap'), d3.select('.tag-wrap').selectAll('span').data())
             });
   
@@ -951,6 +957,6 @@ function autocomplete(inp, arr) {
   /*execute a function when someone clicks in the document:*/
   document.addEventListener("click", function (e) {
       closeAllLists(e.target);
-      console.log('e target', e.target, e.target, e.target.value)
+      
   });
   }

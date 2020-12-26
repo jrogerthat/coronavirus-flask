@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { clearBoard, clearRightSidebar, formatCommentBox, updateCommentSidebar  } from './commentBar';
+import { clearBoard, clearRightSidebar, formatCommentBox, renderCommentDisplayStructure, updateCommentSidebar  } from './commentBar';
 require("regenerator-runtime/runtime");
 import firebase from 'firebase/app';
 import { checkDatabase } from '../firebaseUtil';
@@ -11,8 +11,7 @@ require('firebase/auth');
 require('firebase/database');
 
 export function toggleSort(event){
-   // d3.select('#toggle').on('click', (event, d)=> console.log(event, event.target));
-   console.log(event.target.checked)
+  
    if(event.target.checked){
       let sortedStructureData = annotationData[annotationData.length - 1].filter(f=> f.has_unkown === "TRUE").concat(annotationData[annotationData.length - 1].filter(f=> f.has_unkown === "FALSE"));
       updateAnnotationSidebar(annotationData[annotationData.length - 1], sortedStructureData, null);
@@ -36,27 +35,7 @@ export function toggleSort(event){
    }
 }
 
-export function addCommentButton(d, event){
-   
-    if(event.target.value === 'off'){
-        event.target.value = 'on';
-        d3.select(event.target).text('Go back');
-        let sideWrap = d3.select('#right-sidebar').select('#comment-wrap');
-        // sideWrap.selectAll('*').remove();
-        clearRightSidebar();
-        d3.select('#interaction').style('pointer-events', 'all');
-        //formatTimeControl(sideWrap);
-         formatCommentBox(sideWrap);
 
-    }else{
-        clearBoard();
-        event.target.value = 'off';
-        d3.select(event.target).text('Add Comment');
-        d3.select('#right-sidebar').select('#comment-wrap').selectAll('*').remove();
-        d3.select('#interaction').style('pointer-events', 'all');
-        checkDatabase([updateCommentSidebar]);
-    }
-}
 
 export function renderIssueButton(wrap){
     let bugLink = wrap.append('a');
@@ -81,25 +60,47 @@ export function goBackButton(){
     button.text('Go back');
     button.on('click', (event)=> {
         clearRightSidebar();
+        renderCommentDisplayStructure();
         updateCommentSidebar(dataKeeper[dataKeeper.length - 1]);
         updateAnnotationSidebar(annotationData[annotationData.length - 1], null, null);
-        removeStructureLabelFromButton();
+        addCommentButton();
         clearCanvas();
         d3.select('.tooltip').style('opacity', 0);
     });
 }
 
-  export function removeStructureLabelFromButton(){
+export function addCommentButton(){
     let button = d3.select('#top-bar').select('.add-comment').select('button');
     button.text('Add Comment');
     button.on('click', (event)=>{
         clearRightSidebar();
         d3.select('#interaction').style('pointer-events', 'all');
-        let sideWrap = d3.select('#right-sidebar').select('#comment-wrap');
-     
-        d3.select('#interaction').style('pointer-events', 'all');
-        //formatTimeControl(sideWrap);
-        formatCommentBox(sideWrap);
+        //MAYBE ADD THIS TO clear right sidebar function
+        let wrap = d3.select('#right-sidebar').select('#comment-wrap');
+        wrap.selectAll('*').remove();
+        formatCommentBox(wrap);
         goBackButton();
     });
-  }
+}
+
+// export function addCommentButton(d, event){
+   
+//     if(event.target.value === 'off'){
+//         event.target.value = 'on';
+//         d3.select(event.target).text('Go back');
+//         let sideWrap = d3.select('#right-sidebar').select('#comment-wrap');
+//         // sideWrap.selectAll('*').remove();
+//         clearRightSidebar();
+//         d3.select('#interaction').style('pointer-events', 'all');
+//         //formatTimeControl(sideWrap);
+//          formatCommentBox(sideWrap);
+
+//     }else{
+//         clearBoard();
+//         event.target.value = 'off';
+//         d3.select(event.target).text('Add Comment');
+//         d3.select('#right-sidebar').select('#comment-wrap').selectAll('*').remove();
+//         d3.select('#interaction').style('pointer-events', 'all');
+//         checkDatabase([updateCommentSidebar]);
+//     }
+// }

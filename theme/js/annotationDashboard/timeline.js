@@ -43,8 +43,7 @@ export function renderTimeline(commentData){
     comBins.on('mouseover', (event, d)=> commentBinTimelineMouseover(event, d));
     comBins.on('mouseout', (event, d)=> commentBinTimelineMouseout(event, d));
 
-   let test = commentBins.map((m, i)=> m.data.length);
-   console.log(d3.max(test));
+    let test = commentBins.map((m, i)=> m.data.length);
     
     let annoGroup = timeSVG.append('g').classed('anno-group', true);
     annoGroup.attr('transform', 'translate(0, 40)');
@@ -67,8 +66,6 @@ export function renderTimeline(commentData){
     annos.on('mouseover', (event, d)=> timelineMouseover(event, d))
         .on('mouseout', (event, d)=> timelineMouseout(event, d));
 
-    
-       
 }
 
 export function highlightTimelineBars(timeRange){
