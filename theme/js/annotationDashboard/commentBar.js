@@ -112,6 +112,28 @@ function updateTags(node, tagWrap, tagArray){
     node.value = "";
 }
 
+function vote(type){
+    let votePush = memoDivs.selectAll('.upvote-span').data(d=> [d]).join('span').classed('upvote-span', true);
+    votePush.selectAll(`.${type}`).data(d=> [d]).join('i').classed('upvote fas fa-thumbs-up fa-sm', true);
+    votePush.selectAll('.up-text').data(d=> [d]).join('text').classed('up-text', true).text(d=> `: ${d.upvote} `);
+
+    votePush.on('click', (event, d)=> {
+        let newUp = ++d.upvote;
+        db.ref(`comments/${d.key}/${type}`).set(`${newUp}`);
+    });
+
+    return votePush;
+
+    // let votePush = memoDivs.selectAll('.upvote-span').data(d=> [d]).join('span').classed('upvote-span', true);
+    // votePush.selectAll('.upvote').data(d=> [d]).join('i').classed('upvote fas fa-thumbs-up fa-sm', true);
+    // votePush.selectAll('.up-text').data(d=> [d]).join('text').classed('up-text', true).text(d=> `: ${d.upvote} `);
+
+    // votePush.on('click', (event, d)=> {
+    //     let newUp = ++d.upvote;
+    //     db.ref(`comments/${d.key}/upvote`).set(`${newUp}`);
+    // });
+}
+
 export function drawCommentBoxes(nestedData, wrap, selectedData){
 
     let memoDivs = wrap.selectAll('.memo').data(nestedData).join('div').classed('memo', true);
@@ -145,25 +167,37 @@ export function drawCommentBoxes(nestedData, wrap, selectedData){
     memoDivs.style('border', d=> {
         return `1px solid gray`});
 
-    let upvote = memoDivs.selectAll('.upvote-span').data(d=> [d]).join('span').classed('upvote-span', true);
-    upvote.selectAll('.upvote').data(d=> [d]).join('i').classed('upvote fas fa-thumbs-up fa-sm', true);
-    upvote.selectAll('.up-text').data(d=> [d]).join('text').classed('up-text', true).text(d=> `: ${d.upvote} `);
+//UPVOTE
+    let upVote = memoDivs.selectAll('.upvote-span').data(d=> [d]).join('span').classed('upvote-span', true);
+    upVote.selectAll('.upvote').data(d=> [d]).join('i').classed('upvote fas fa-thumbs-up fa-sm', true);
+    upVote.selectAll('.up-text').data(d=> [d]).join('text').classed('up-text', true).text(d=> `: ${d.upvote} `);
 
+    upVote.on('click', (event, d)=> {
+        let newUp = ++d.upvote;
+        db.ref(`comments/${d.key}/upvote`).set(`${newUp}`);
+    });
+
+//DOWNVOTE
     let downvote = memoDivs.selectAll('.downvote-span').data(d=> [d]).join('span').classed('downvote-span', true);
     downvote.selectAll('.downvote').data(d=> [d]).join('i').classed('downvote fas fa-thumbs-down fa-sm', true);
     downvote.selectAll('.down-text').data(d=> [d]).join('text').classed('down-text', true).text(d=> `: ${d.downvote}`);
 
-    let reply = memoDivs.selectAll('.reply-span').data(d=> [d]).join('span').classed('reply-span', true).text('Reply ');
-    reply.selectAll('.reply').data(d=> [d]).join('i').classed('far fa-comment-dots fa-lg reply', true)//.style('float', 'right')//.text('Reply');
+    downvote.on('click', (event, d)=> {
+        let newDown = ++d.downvote;
+        db.ref(`comments/${d.key}/downvote`).set(`${newDown}`);
+    });
 
+//RESOLVE
     let resolve = memoDivs.filter(f=> {
         return f.uid === currentUser[currentUser.length - 1].uid
     }).selectAll('.resolve-span').data(d=> [d]).join('span').classed('resolve-span', true).text("Resolve ")
     resolve.selectAll('.resolve').data(d=> [d]).join('i').classed('resolve', true).classed('resolve fas fa-check', true);//.text(d=> `${d.displayName}:`);
-
     resolve.on('click', (d)=> {
         db.ref(`comments/${d.key}/resolved`).set(`true`);
     });
+//REPLY
+    let reply = memoDivs.selectAll('.reply-span').data(d=> [d]).join('span').classed('reply-span', true).text('Reply ');
+    reply.selectAll('.reply').data(d=> [d]).join('i').classed('far fa-comment-dots fa-lg reply', true)//.style('float', 'right')//.text('Reply');
 
     reply.on("click", function(event, d) {
 
@@ -195,22 +229,13 @@ export function drawCommentBoxes(nestedData, wrap, selectedData){
 
       var db = firebase.database();
 
-      upvote.on('click', (event, d)=> {
-          let newUp = ++d.upvote;
-          db.ref(`comments/${d.key}/upvote`).set(`${newUp}`);
-      });
-  
-      downvote.on('click', (event, d)=> {
-          let newDown = ++d.downvote;
-          db.ref(`comments/${d.key}/downvote`).set(`${newDown}`);
-      });
-  
+
       memoDivs.on('click', (event, d)=>{
         
-          if(d3.event.target.tagName.toLowerCase() === 'textarea' || 
-          d3.event.target.tagName.toLowerCase() === 'button' || 
-          d3.event.target.tagName.toLowerCase() === 'a' || 
-          d3.event.target.tagName.toLowerCase() === 'svg'){
+          if(event.target.tagName.toLowerCase() === 'textarea' || 
+          event.target.tagName.toLowerCase() === 'button' || 
+          event.target.tagName.toLowerCase() === 'a' || 
+          event.target.tagName.toLowerCase() === 'svg'){
           
           }else{ 
               skipAheadCircle(d.videoTime);
@@ -333,7 +358,7 @@ export function radioBlob(div, t1Ob, t2Ob, t3Ob, className){
     labelOne.node().for = 't1';
 
     let inputOne = labelOne.append('input').attr('id', 't1')
-    inputOne.node().name = 'radio';//'name', 'comment')
+    inputOne.node().name = 'radio';
     inputOne.node().type = 'radio';
     inputOne.node().checked = true;
 
@@ -361,7 +386,7 @@ export function radioBlob(div, t1Ob, t2Ob, t3Ob, className){
     let inputCheck3 = labelThree.append('span').classed('checkmark', true);
 
     inputOne.on('click', (event)=> {
-           
+           console.log('t1 callback');
             inputOne.node().checked = true;
             inputTwo.node().checked = false;
             form.node().value = 't1';
@@ -369,7 +394,7 @@ export function radioBlob(div, t1Ob, t2Ob, t3Ob, className){
     });
 
     inputTwo.on('click', (event)=> {
-
+        console.log('t2 callback');
             inputOne.node().checked = false;
             inputTwo.node().checked = true;
             form.node().value = 't2';
@@ -378,7 +403,7 @@ export function radioBlob(div, t1Ob, t2Ob, t3Ob, className){
     });
 
     inputThree.on('click', (event)=> {
-
+        console.log('t3 callback');
         inputOne.node().checked = false;
         inputTwo.node().checked = false;
         inputThree.node().checked = true;
@@ -635,7 +660,7 @@ export function renderCommentDisplayStructure(){
     wrap.append('div').classed('general-comm-wrap', true);
 }
 
-export function formatCommentBox(div){
+export function formatCommenting(div){
 
     let dropId = 'comment-type';
 

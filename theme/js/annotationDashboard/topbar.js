@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { clearBoard, clearRightSidebar, formatCommentBox, renderCommentDisplayStructure, updateCommentSidebar  } from './commentBar';
+import { clearBoard, clearRightSidebar, formatCommenting, renderCommentDisplayStructure, updateCommentSidebar  } from './commentBar';
 require("regenerator-runtime/runtime");
 import firebase from 'firebase/app';
 import { checkDatabase } from '../firebaseUtil';
@@ -75,10 +75,8 @@ export function addCommentButton(){
     button.on('click', (event)=>{
         clearRightSidebar();
         d3.select('#interaction').style('pointer-events', 'all');
-        //MAYBE ADD THIS TO clear right sidebar function
         let wrap = d3.select('#right-sidebar').select('#comment-wrap');
-        wrap.selectAll('*').remove();
-        formatCommentBox(wrap);
+        formatCommenting(wrap);
         goBackButton();
     });
 }
@@ -93,7 +91,7 @@ export function addCommentButton(){
 //         clearRightSidebar();
 //         d3.select('#interaction').style('pointer-events', 'all');
 //         //formatTimeControl(sideWrap);
-//          formatCommentBox(sideWrap);
+//          formatCommenting(sideWrap);
 
 //     }else{
 //         clearBoard();

@@ -53,10 +53,8 @@ async function init(){
         .style("border-radius", "5px")
         .style("padding", "5px");
 
-    d3.select('.add-comment').select('button').on('click', (event, d)=> addCommentButton(d, event));
+    addCommentButton();
     d3.select('#toggle').select('input').on('click', (event)=> toggleSort(event));
-   
-    
 }
 
 
