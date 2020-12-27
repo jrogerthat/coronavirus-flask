@@ -56,8 +56,6 @@ function replyInputBox(d, i, n, user){
 
 export function formatCommentData(dbRef){
 
-    console.log('dbreffff', dbRef)
-
     let dataAnno = Object.entries(dbRef.comments)
     .map(m=> {
         let value = m[1];
@@ -74,7 +72,7 @@ export function formatCommentData(dbRef){
         let nestReplies = data.map((d, i, n)=>{
         return recurse(d, replyData, 0);
         });
-        console.log(nestReplies);
+      
         return nestReplies;
 
     // }else{
@@ -115,7 +113,7 @@ function updateTags(node, tagWrap, tagArray){
 }
 
 export function drawCommentBoxes(nestedData, wrap, selectedData){
-    console.log('in draw comment boxes', nestedData)
+   
     let memoDivs = wrap.selectAll('.memo').data(nestedData).join('div').classed('memo', true);
     memoDivs.selectAll('.name').data(d=> [d]).join('span').classed('name', true).selectAll('text').data(d=> [d]).join('text').text(d=> `${d.displayName}:`);
     memoDivs.selectAll('.time').data(d=> [d]).join('span').classed('time', true).selectAll('text').data(d=> [d]).join('text').text(d=> {
@@ -257,28 +255,32 @@ export const tagOptions = [
 ];
 
 export function renderStructureKnowns(topCommentWrap, snip, structureData, questions, refs){
-
+    let structs = colorDictionary[snip].structure[0];
     topCommentWrap.append('div').classed('found-info', true)
     .html(`<h4>${colorDictionary[snip].structure[0]}</h4>
     <span class="badge badge-pill badge-info"><h7>${structureData.length}</h7></span> annotations for this structure. <br>
     <span class="badge badge-pill badge-danger">${questions}</span> Questions. <br>
     <span class="badge badge-pill badge-warning">${refs}</span> Refs. <br>
     <br>
-    <button class="btn btn-outline-secondary add-comment-structure">Add comment for this structure</button> <br>
     `)
+
+    console.log('structure data in render structure', structureData)
 
     topCommentWrap.append('button')
       .classed("btn btn-outline-secondary add-comment-structure", true)
-      .text("Add comment for this structure")
+      .text("Add comment for this structure TEST")
       .on('click', (event, d)=> {
+
+        console.log('render structssss',structs);
     
         topCommentWrap.selectAll('*').remove();
-        formatCommenting(topCommentWrap);
+        let structArray = [structs.toString()];
+        formatCommenting(topCommentWrap, structArray);
 
       });
 }
 
-export function defaultTemplate(div){
+export function defaultTemplate(div, defaultTags){
 
     let currentTime = document.getElementById('video').currentTime;
 
@@ -297,7 +299,7 @@ export function defaultTemplate(div){
     inputDiv.append('textarea').attr('id', 'text-area-id').attr('placeholder', 'Comment Here');
     //let tagButton = dropDown(inputDiv, tagOptions, 'Tag', 'tag-drop');
 
-    let defaultTags = []
+    //let defaultTags = []
 
     addTagFunctionality(inputDiv, defaultTags);
 
@@ -385,7 +387,7 @@ export function radioBlob(div, t1Ob, t2Ob, t3Ob, className){
     let inputCheck3 = labelThree.append('span').classed('checkmark', true);
 
     inputOne.on('click', (event)=> {
-           console.log('t1 callback');
+          // console.log('t1 callback');
             inputOne.node().checked = true;
             inputTwo.node().checked = false;
             form.node().value = 't1';
@@ -393,7 +395,7 @@ export function radioBlob(div, t1Ob, t2Ob, t3Ob, className){
     });
 
     inputTwo.on('click', (event)=> {
-        console.log('t2 callback');
+        //console.log('t2 callback');
             inputOne.node().checked = false;
             inputTwo.node().checked = true;
             form.node().value = 't2';
@@ -402,7 +404,7 @@ export function radioBlob(div, t1Ob, t2Ob, t3Ob, className){
     });
 
     inputThree.on('click', (event)=> {
-        console.log('t3 callback');
+        //console.log('t3 callback');
         inputOne.node().checked = false;
         inputTwo.node().checked = false;
         inputThree.node().checked = true;
@@ -684,7 +686,7 @@ export function formatComment2Send(user, currentTime, mark, tag, coords, replyTo
     }
 }
 
-export function formatCommenting(div){
+export function formatCommenting(div, startingTags){
 
     let dropId = 'comment-type';
 
@@ -715,7 +717,7 @@ export function formatCommenting(div){
         }
     });
 
-    defaultTemplate(div);
+    defaultTemplate(div, startingTags);
     
     let t1Ob = {label: "No spatial reference", callBack: noMarkFormat};
     let t2Ob = {label: "Mark a Point", callBack: formatPush};

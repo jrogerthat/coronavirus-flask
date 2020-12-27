@@ -76,7 +76,7 @@ export function addCommentButton(){
         clearRightSidebar();
         d3.select('#interaction').style('pointer-events', 'all');
         let wrap = d3.select('#right-sidebar').select('#comment-wrap');
-        formatCommenting(wrap);
+        formatCommenting(wrap, []);
         goBackButton();
     });
 }
