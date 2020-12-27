@@ -277,7 +277,7 @@ export function renderStructureKnowns(topCommentWrap){
       });
 }
 
-export function defaultTemplate(div, defaultTags){
+export function defaultTemplate(div, tagArray){
 
     let currentTime = document.getElementById('video').currentTime;
 
@@ -295,7 +295,7 @@ export function defaultTemplate(div, defaultTags){
 
     inputDiv.append('textarea').attr('id', 'text-area-id').attr('placeholder', 'Comment Here');
 
-    addTagFunctionality(inputDiv, defaultTags);
+    addTagFunctionality(inputDiv, tagArray);
 
 }
 
@@ -364,8 +364,8 @@ export function radioBlob(div, t1Ob, t2Ob, t3Ob, className){
     labelTwo.node().for = 't2';
 
     let inputTwo = labelTwo.append('input').attr('id', 't2')
-    inputTwo.node().name = 'radio';//.attr('name', 'comment')
-    inputTwo.node().type = 'radio';//.attr('type', 'radio');
+    inputTwo.node().name = 'radio';
+    inputTwo.node().type = 'radio';
     inputTwo.node().checked = false;
 
     let inputCheck2 = labelTwo.append('span').classed('checkmark', true);
@@ -381,7 +381,7 @@ export function radioBlob(div, t1Ob, t2Ob, t3Ob, className){
     let inputCheck3 = labelThree.append('span').classed('checkmark', true);
 
     inputOne.on('click', (event)=> {
-          // console.log('t1 callback');
+      
             inputOne.node().checked = true;
             inputTwo.node().checked = false;
             form.node().value = 't1';
@@ -389,7 +389,7 @@ export function radioBlob(div, t1Ob, t2Ob, t3Ob, className){
     });
 
     inputTwo.on('click', (event)=> {
-        //console.log('t2 callback');
+       
             inputOne.node().checked = false;
             inputTwo.node().checked = true;
             form.node().value = 't2';
@@ -398,7 +398,7 @@ export function radioBlob(div, t1Ob, t2Ob, t3Ob, className){
     });
 
     inputThree.on('click', (event)=> {
-        //console.log('t3 callback');
+      
         inputOne.node().checked = false;
         inputTwo.node().checked = false;
         inputThree.node().checked = true;
@@ -564,34 +564,37 @@ export function formatPush(){
     canvas.width = 0;
    
     let interactionDiv = d3.select('#interaction');
-    
-   // interactionDiv.style('width', `${document.getElementById('video').getBoundingClientRect().width}px`);
-   // interactionDiv.style('height', `${document.getElementById('video').getBoundingClientRect().height}px`);
 
     let clickedBool = false;
 
-    if(d3.select('.add-comment').select('button').node().value === 'on' && d3.select('.media-tabber').node().value === 't2'){
+    if(d3.select('.media-tabber').node().value === 't2'){
 
-        interactionDiv.on('mouseenter', function(event){
-            let coords = d3.pointer(this);
+        interactionDiv.on('mouseenter', function(event, d){
+            let coords = d3.pointer(event);
+
+            console.log('pointer', coords);
     
-            //interactionDiv.classed('crosshair', true);
-            if(d3.select('#push-div').empty() && !d3.select('.media-tabber').empty() && d3.select('.media-tabber').node().value === 't2'){
+         
+            if(d3.select('#push-div').empty()){
+                let dims = interactionDiv.node().getBoundingClientRect();
+                console.log(dims);
                 let pushDiv = interactionDiv.append('div').attr('id', 'push-div');
                 pushDiv.style('position', 'absolute')
-                pushDiv.style('top', (d)=> (coords[1]-10)+'px')
-                pushDiv.style('left', (d)=> (coords[0]-10)+'px')
+                pushDiv.style('top', (d)=> (coords[1]-(dims.top - 50))+'px')
+                pushDiv.style('left', (d)=> (coords[0])+'px')
+                // pushDiv.style('top', (d)=> (coords[1]-10)+'px')
+                // pushDiv.style('left', (d)=> (coords[0]-10)+'px')
                 let push = pushDiv.append('div').classed('push', true);
                 push.append('i').classed('fas fa-map-pin', true);
             }
         });
     
         interactionDiv.on('mousemove', function(event) {
-    
-            let coords = d3.pointer(this);
+            let dims = interactionDiv.node().getBoundingClientRect();
+            let coords = d3.pointer(event);
             let pushDiv = d3.select('#push-div');
             if(!pushDiv.empty() && !clickedBool){
-                pushDiv.style('top', (d)=> (coords[1]-10)+'px');
+                pushDiv.style('top', (d)=> (coords[1]-(dims.top - 50))+'px')
                 pushDiv.style('left', (d)=> (coords[0]-10)+'px');
             }
         });
