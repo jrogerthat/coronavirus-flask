@@ -3,7 +3,7 @@ import { annotationData } from '..';
 import { dataKeeper, formatAnnotationTime, formatTime } from '../dataManager';
 import { addStructureLabelFromButton, addCommentButton, goBackButton } from './topbar'
 import { clearCanvas, colorDictionary, currentImageData, drawFrameOnPause, endDrawTime, getCoordColor, makeNewImageData, parseArray } from './imageDataUtil';
-import { drawCommentBoxes, formatCommentData, updateCommentSidebar, clearRightSidebar, highlightCommentBoxes, renderCommentDisplayStructure } from './commentBar';
+import { drawCommentBoxes, formatCommentData, updateCommentSidebar, clearRightSidebar, highlightCommentBoxes, renderCommentDisplayStructure, renderStructureKnowns } from './commentBar';
 import { highlightAnnotationbar, updateAnnotationSidebar } from './annotationBar';
 import { highlightTimelineBars } from './timeline';
 import firebase from 'firebase/app';
@@ -158,7 +158,9 @@ export async function mouseClickVideo(coord, video){
     togglePlay();
 
   }else{ 
-    
+    /**
+     * VIDEO PAUSED - CLICKED NOT ON STRUCTURE
+     */
     let snip = getCoordColor(coord);
 
     if(snip === "black" || snip === "unknown"){
@@ -166,7 +168,8 @@ export async function mouseClickVideo(coord, video){
       togglePlay();
 
       addCommentButton();
-
+      clearRightSidebar();
+      renderCommentDisplayStructure();
       updateCommentSidebar(commentData);
       updateAnnotationSidebar(annotationData[annotationData.length - 1], null, null)
     
@@ -175,10 +178,12 @@ export async function mouseClickVideo(coord, video){
             .style("opacity", 0);
 
     }else{
+      /**
+       * VIDEO PAUSED - CLICKED ON STRUCTURE
+       */
       structureClicked = true;
       parseArray(currentImageData, snip);
-      console.log('commentData in structure', commentData);
-
+    
       let nestReplies = formatCommentData(Object.assign({}, commentData), null);
 
       let test = nestReplies.filter((f)=> {
@@ -196,44 +201,37 @@ export async function mouseClickVideo(coord, video){
       let sortedStructureData = structureData.filter(f=> f.has_unkown === "TRUE").concat(structureData.filter(f=> f.has_unkown === "FALSE"))
       structureTooltip(structureData, coord, snip, false);
       let annoWrap = d3.select('#left-sidebar');
-      
+
+      goBackButton();
       clearRightSidebar();
       renderCommentDisplayStructure();
+      //NEED TO CLEAR THIS UP - LOOKS LIKE YOU ARE REPEATING WORK IN UPDATE COMMENT SIDEBAR AND DRAW COMMETN BOXES
       updateCommentSidebar(commentData, test);
       updateAnnotationSidebar(annotationData[annotationData.length - 1], sortedStructureData, null);
       annoWrap.select('.top').append('h6').text('   Spike Protein Annotations: ');
 
-      let commentWrap = d3.select('#comment-wrap').select('.top');
+      
       let genComWrap = d3.select('#comment-wrap').select('.general-comm-wrap');
       let selectedComWrap = d3.select('#comment-wrap').select('.selected-comm-wrap');
-     
 
-      goBackButton();
-      
       let questions = structureData.filter(f=> f.has_unkown === "TRUE").length + test.filter(f=> f.comment.includes('?')).length;
       let refs = structureData.filter(f=> f.url != "").length + test.filter(f=> f.comment.includes('http')).length;
-
-      commentWrap.append('div').html(`<h4>${colorDictionary[snip].structure[0]}</h4>
-      <span class="badge badge-pill badge-info"><h7>${structureData.length}</h7></span> annotations for this structure. <br>
-      <span class="badge badge-pill badge-danger">${questions}</span> Questions. <br>
-      <span class="badge badge-pill badge-warning">${refs}</span> Refs. <br>
-      <br>
-      <button class="btn btn-outline-secondary add-comment-structure">Add comment for this structure</button> <br>
-      `)
+      
+      let topCommentWrap = d3.select('#comment-wrap').select('.top');
+      renderStructureKnowns(topCommentWrap, snip, structureData, questions, refs);
 
       let stackedData = structureData.filter(f=> f.has_unkown == "TRUE").concat(structureData.filter(f=> f.has_unkown == "FALSE"));
-
-      let annos = commentWrap.selectAll('.anno').data(stackedData).join('div').classed('anno', true);
+      let annos = topCommentWrap.selectAll('.anno').data(stackedData).join('div').classed('anno', true);
 
       let unknowns = annos.filter(f=> f.has_unkown === 'TRUE');
       unknowns.classed('unknown', true);
 
       selectedComWrap.append('h7').text("Associated Comments: ");
 
+  //MIGHT BE REPEATING WORK - ALREADY HAVE UPDATE COMMENT SIDEBAR ABOVE
       drawCommentBoxes(test, selectedComWrap);
-   
       drawCommentBoxes(nestReplies, genComWrap);
-      genComWrap.selectAll('.memo').style('opacity',  0.3);
+      genComWrap.selectAll('.memo').style('opacity', 0.3);
     }
   }
 }

@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import { currentUser, dataKeeper, formatVideoTime } from '../dataManager';
 import firebase from 'firebase/app';
 import { checkDatabase } from '../firebaseUtil';
+import { colorDictionary } from './imageDataUtil';
 require('firebase/auth');
 require('firebase/database');
 
@@ -255,6 +256,28 @@ export const tagOptions = [
     {key: 'other', color: 'black'}
 ];
 
+export function renderStructureKnowns(topCommentWrap, snip, structureData, questions, refs){
+
+    topCommentWrap.append('div').classed('found-info', true)
+    .html(`<h4>${colorDictionary[snip].structure[0]}</h4>
+    <span class="badge badge-pill badge-info"><h7>${structureData.length}</h7></span> annotations for this structure. <br>
+    <span class="badge badge-pill badge-danger">${questions}</span> Questions. <br>
+    <span class="badge badge-pill badge-warning">${refs}</span> Refs. <br>
+    <br>
+    <button class="btn btn-outline-secondary add-comment-structure">Add comment for this structure</button> <br>
+    `)
+
+    topCommentWrap.append('button')
+      .classed("btn btn-outline-secondary add-comment-structure", true)
+      .text("Add comment for this structure")
+      .on('click', (event, d)=> {
+        console.log('button cicked');
+        topCommentWrap.selectAll('*').remove();
+        formatCommenting(topCommentWrap);
+
+      });
+}
+
 export function defaultTemplate(div){
 
     let currentTime = document.getElementById('video').currentTime;
@@ -405,9 +428,8 @@ export function doodleSubmit(commentType, user, tags, d, currentTime){
 
     imagesRef.putString(message, 'data_url').then(function(snapshot) {
     
-      //  let currentTime = document.getElementById('video').currentTime;
         let coords = !d3.select('#push-div').empty() ? [d3.select('#push-div').style('left'), d3.select('#push-div').style('top')] : null;
-    //user, currentTime, mark, tag, coords, replyTo, quote
+
         let dataPush = formatComment2Send(user, currentTime, 'doodle', tags.data().toString(), coords, null, null);
         dataPush.doodle = true;
         dataPush.doodleName = snapshot.metadata.name;
@@ -702,8 +724,6 @@ export function formatCommenting(div){
     let t3Ob = {label: "Draw", callBack: formatCanvas};
 
     let form = radioBlob(div, t1Ob, t2Ob, t3Ob, 'media-tabber');
-
-    // formatPush();
     noMarkFormat();
 
     let submit = div.append('button').attr('id', 'comment-submit-button').text('Add').classed('btn btn-secondary', true);
