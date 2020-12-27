@@ -553,3 +553,149 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 }
+
+//sidebar commenting
+
+.text-input{
+  width:210px;
+  height:150px;
+  background: white;
+  border-radius: 4px;
+  position:relative;
+  top:-10px;
+  left:10px;
+  padding: 7px;
+  border: 2px solid gray;
+  font-size: 12px;
+}
+
+.temp-text{
+  font-size: 12px;
+}
+
+.template-wrap{
+  display: flex;
+  flex-basis: 100%;
+  flex:1;
+  justify-content: center;
+  flex-direction: column;
+  padding:10px;
+}
+
+
+.comment-initiated{
+  // min-width:210px;
+  // max-width:310px;
+  // min-height:70px;
+  background: white;
+  border-radius: 4px;
+  position:relative;
+  top:-70px;
+  left:10px;
+  padding: 7px;
+  border: 2px solid gray;
+  color:gray;
+  font-size: 12px;
+}
+
+.text-input textarea {
+  width:190px;
+  border-radius: 4px;
+}
+
+.text-input-sidebar{
+  border-left: 1px solid gray;
+  padding:5px;
+}
+
+.text-input-sidebar textarea{
+  width:200px;
+  border-radius: 4px;
+}
+
+.text-input-sidebar text{
+  display:block;
+}
+
+.text-input #tags, .text-input-sidebar #tags{
+  height:25px;
+}
+
+//autocomplete and tags
+
+.tag-wrap{
+  // border:1px solid gray;
+  // border-radius: 3px;
+  // position: relative;
+  // top:32px;
+  z-index: 100;
+  padding:2px 2px 2px 2px;
+  
+}
+
+.tag-wrap span{
+  // border:1px solid gray;
+  // border-radius: 3px;
+ padding:5px;
+ background-color: #E8E8E8;
+ border: 3px solid white;
+ color:gray;
+ font-weight: 100;
+ display:inline;
+}
+
+.tag-input-wrap{
+    border:1px solid gray;
+    border-radius: 3px;
+    display:flex;
+    padding:2px;
+    // min-width:300px;
+    width:280px;
+    height:auto;
+}
+
+.tag-input-wrap input{
+ box-sizing: content-box;
+ height:30px;
+ padding:0;
+ border:0;
+}
+
+.tag-input-wrap input{
+  font-size:11px;
+ }
+
+
+ .autocomplete {
+  /*the container must be positioned relative:*/
+  position: relative;
+  display: inline-block;
+}
+
+.autocomplete-items {
+  position: relative;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 30px;
+  left:-220px;
+  right: 0;
+}
+
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff;
+  border-bottom: 1px solid #d4d4d4;
+}
+.autocomplete-items div:hover {
+  /*when hovering an item:*/
+  background-color: #e9e9e9;
+}
+.autocomplete-active {
+  /*when navigating through the items using the arrow keys:*/
+  background-color: DodgerBlue !important;
+  color: #ffffff;
+}

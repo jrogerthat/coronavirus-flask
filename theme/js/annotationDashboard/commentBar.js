@@ -271,7 +271,7 @@ export function renderStructureKnowns(topCommentWrap, snip, structureData, quest
       .classed("btn btn-outline-secondary add-comment-structure", true)
       .text("Add comment for this structure")
       .on('click', (event, d)=> {
-        console.log('button cicked');
+    
         topCommentWrap.selectAll('*').remove();
         formatCommenting(topCommentWrap);
 
@@ -335,16 +335,14 @@ export function addTagFunctionality(inputDiv, tagArray){
     if (event.key === "Enter") {
         
             if(node.value != ""){
-
               updateTags(node, tagWrap, tagArray)
-
             }else{
                 console.log('nothing to add');
             }
         }
     });
 
-    let array = [...dataKeeper[dataKeeper.length - 1].comments];
+    let array = Object.assign({}, dataKeeper[dataKeeper.length - 1]).comments;
     let test = Object.entries(array).map(m=> m[1]).flatMap(m=> m.tags.split(','));
 
 
