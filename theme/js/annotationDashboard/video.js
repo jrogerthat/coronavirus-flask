@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { annotationData } from '..';
 import { dataKeeper, formatAnnotationTime, formatTime } from '../dataManager';
 import { addStructureLabelFromButton, addCommentButton, goBackButton } from './topbar'
-import { clearCanvas, colorDictionary, currentImageData, drawFrameOnPause, endDrawTime, getCoordColor, makeNewImageData, parseArray } from './imageDataUtil';
+import { clearCanvas, colorDictionary, currentImageData, drawFrameOnPause, endDrawTime, getCoordColor, makeNewImageData, parseArray, structureSelected } from './imageDataUtil';
 import { drawCommentBoxes, formatCommentData, updateCommentSidebar, clearRightSidebar, highlightCommentBoxes, renderCommentDisplayStructure, renderStructureKnowns } from './commentBar';
 import { highlightAnnotationbar, updateAnnotationSidebar } from './annotationBar';
 import { highlightTimelineBars } from './timeline';
@@ -11,7 +11,7 @@ import firebase from 'firebase/app';
 import 'firebase/storage';
 
 let canPlay;
-let structureClicked = false;
+
 
 const currentColorCodes = [];
 
@@ -126,7 +126,7 @@ export function togglePlay() {
 export async function mouseMoveVideo(coord, video){
   if(video.playing){
     console.log('video playing');
-  }else if(structureClicked || video.currentTime >= endDrawTime){
+  }else if(structureSelected.selected || video.currentTime >= endDrawTime){
     console.log('what this do');
   }else{
 
@@ -150,11 +150,13 @@ export async function mouseMoveVideo(coord, video){
 export async function mouseClickVideo(coord, video){
 
   let commentData = Object.assign({}, dataKeeper[dataKeeper.length - 1]);
-  console.log('first comment data on mouseclick', commentData);
+
 
   if(video.playing){
     console.log('is playing');
-    structureClicked = false;
+    structureSelected.selected  = false;
+    structureSelected.structure = null;
+    
     togglePlay();
 
   }else{ 
@@ -164,7 +166,10 @@ export async function mouseClickVideo(coord, video){
     let snip = getCoordColor(coord);
 
     if(snip === "black" || snip === "unknown"){
-      structureClicked = false;
+     
+      structureSelected.selected  = false;
+      structureSelected.structure = null;
+   
       togglePlay();
 
       addCommentButton();
@@ -181,7 +186,10 @@ export async function mouseClickVideo(coord, video){
       /**
        * VIDEO PAUSED - CLICKED ON STRUCTURE
        */
-      structureClicked = true;
+    
+      structureSelected.selected  = true;
+      structureSelected.structure = colorDictionary[snip].structure[0];
+   
       parseArray(currentImageData, snip);
     
       let nestReplies = formatCommentData(Object.assign({}, commentData), null);

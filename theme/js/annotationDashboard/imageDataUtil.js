@@ -1,4 +1,8 @@
 export const endDrawTime = 84;
+export const structureSelected = {
+  selected: false,
+  structure: null
+}
 
 export const colorDictionary = {
   'blue': {'code':[0, 0, 255], 'structure': ['Cell Membrane']},
