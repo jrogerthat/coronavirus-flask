@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { currentUser, dataKeeper, formatVideoTime } from '../dataManager';
 import firebase from 'firebase/app';
 import { checkDatabase } from '../firebaseUtil';
-import { colorDictionary } from './imageDataUtil';
+import { colorDictionary, structureSelected } from './imageDataUtil';
 require('firebase/auth');
 require('firebase/database');
 
@@ -254,11 +254,14 @@ export const tagOptions = [
     {key: 'other', color: 'black'}
 ];
 
-export function renderStructureKnowns(topCommentWrap, snip, structureData, questions, refs){
-    let structs = colorDictionary[snip].structure[0];
+export function renderStructureKnowns(topCommentWrap){
+
+    let questions =  structureSelected.annotations.filter(f=> f.has_unkown === "TRUE").length + structureSelected.comments.filter(f=> f.comment.includes('?')).length;
+    let refs =  structureSelected.annotations.filter(f=> f.url != "").length + structureSelected.comments.filter(f=> f.comment.includes('http')).length;
+
     topCommentWrap.append('div').classed('found-info', true)
-    .html(`<h4>${colorDictionary[snip].structure[0]}</h4>
-    <span class="badge badge-pill badge-info"><h7>${structureData.length}</h7></span> annotations for this structure. <br>
+    .html(`<h4>${structureSelected.structure}</h4>
+    <span class="badge badge-pill badge-info"><h7>${structureSelected.annotations.length}</h7></span> annotations for this structure. <br>
     <span class="badge badge-pill badge-danger">${questions}</span> Questions. <br>
     <span class="badge badge-pill badge-warning">${refs}</span> Refs. <br>
     <br>
@@ -269,7 +272,7 @@ export function renderStructureKnowns(topCommentWrap, snip, structureData, quest
       .text("Add comment for this structure")
       .on('click', (event, d)=> {
         topCommentWrap.selectAll('*').remove();
-        let structArray = [structs.toString()];
+        let structArray = [structureSelected.structure.toString()];
         formatCommenting(topCommentWrap, structArray);
       });
 }

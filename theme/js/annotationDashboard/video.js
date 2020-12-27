@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { annotationData } from '..';
 import { dataKeeper, formatAnnotationTime, formatTime } from '../dataManager';
 import { addStructureLabelFromButton, addCommentButton, goBackButton } from './topbar'
-import { clearCanvas, colorDictionary, currentImageData, drawFrameOnPause, endDrawTime, getCoordColor, makeNewImageData, parseArray, structureSelected } from './imageDataUtil';
+import { clearCanvas, colorDictionary, currentImageData, drawFrameOnPause, endDrawTime, getCoordColor, makeNewImageData, parseArray, structureSelected, structureSelectedToggle } from './imageDataUtil';
 import { drawCommentBoxes, formatCommentData, updateCommentSidebar, clearRightSidebar, highlightCommentBoxes, renderCommentDisplayStructure, renderStructureKnowns } from './commentBar';
 import { highlightAnnotationbar, updateAnnotationSidebar } from './annotationBar';
 import { highlightTimelineBars } from './timeline';
@@ -151,11 +151,11 @@ export async function mouseClickVideo(coord, video){
 
   let commentData = Object.assign({}, dataKeeper[dataKeeper.length - 1]);
 
-
   if(video.playing){
     console.log('is playing');
-    structureSelected.selected  = false;
-    structureSelected.structure = null;
+
+    structureSelectedToggle(null);
+    console.log('structure', structureSelected);
     
     togglePlay();
 
@@ -167,11 +167,10 @@ export async function mouseClickVideo(coord, video){
 
     if(snip === "black" || snip === "unknown"){
      
-      structureSelected.selected  = false;
-      structureSelected.structure = null;
+      structureSelectedToggle(null);
+      console.log('structure', structureSelected);
    
       togglePlay();
-
       addCommentButton();
       clearRightSidebar();
       renderCommentDisplayStructure();
@@ -187,14 +186,12 @@ export async function mouseClickVideo(coord, video){
        * VIDEO PAUSED - CLICKED ON STRUCTURE
        */
     
-      structureSelected.selected  = true;
-      structureSelected.structure = colorDictionary[snip].structure[0];
-   
+      structureSelectedToggle(colorDictionary[snip].structure[0]);
       parseArray(currentImageData, snip);
     
       let nestReplies = formatCommentData(Object.assign({}, commentData), null);
 
-      let test = nestReplies.filter((f)=> {
+      structureSelected.comments = nestReplies.filter((f)=> {
         if(colorDictionary[snip].structure[1]){
           return f.comment.toUpperCase().includes(colorDictionary[snip].structure[0].toUpperCase()) || f.comment.toUpperCase().includes(colorDictionary[snip].structure[1].toUpperCase);
         }else{
@@ -202,33 +199,30 @@ export async function mouseClickVideo(coord, video){
         }
       });
 
-      let structureData = annotationData[annotationData.length - 1].filter(f=> {
+      let structureAnnotations = annotationData[annotationData.length - 1].filter(f=> {
         return f.associated_structures.split(', ').map(m=> m.toUpperCase()).indexOf(colorDictionary[snip].structure[0].toUpperCase()) > -1;
       });
 
-      let sortedStructureData = structureData.filter(f=> f.has_unkown === "TRUE").concat(structureData.filter(f=> f.has_unkown === "FALSE"))
-      structureTooltip(structureData, coord, snip, false);
+      structureSelected.annotations = structureAnnotations.filter(f=> f.has_unkown === "TRUE").concat(structureAnnotations.filter(f=> f.has_unkown === "FALSE"))
+      
+      structureTooltip(structureAnnotations, coord, snip, false);
       let annoWrap = d3.select('#left-sidebar');
 
       goBackButton();
       clearRightSidebar();
       renderCommentDisplayStructure();
-      //NEED TO CLEAR THIS UP - LOOKS LIKE YOU ARE REPEATING WORK IN UPDATE COMMENT SIDEBAR AND DRAW COMMETN BOXES
-      updateCommentSidebar(commentData, test);
-      updateAnnotationSidebar(annotationData[annotationData.length - 1], sortedStructureData, null);
-      annoWrap.select('.top').append('h6').text('   Spike Protein Annotations: ');
 
-      
       let genComWrap = d3.select('#comment-wrap').select('.general-comm-wrap');
       let selectedComWrap = d3.select('#comment-wrap').select('.selected-comm-wrap');
-
-      let questions = structureData.filter(f=> f.has_unkown === "TRUE").length + test.filter(f=> f.comment.includes('?')).length;
-      let refs = structureData.filter(f=> f.url != "").length + test.filter(f=> f.comment.includes('http')).length;
-      
       let topCommentWrap = d3.select('#comment-wrap').select('.top');
-      renderStructureKnowns(topCommentWrap, snip, structureData, questions, refs);
+      //NEED TO CLEAR THIS UP - LOOKS LIKE YOU ARE REPEATING WORK IN UPDATE COMMENT SIDEBAR AND DRAW COMMETN BOXES
+      updateCommentSidebar(commentData, structureSelected.comments);
+      updateAnnotationSidebar(annotationData[annotationData.length - 1], structureSelected.annotations, null);
+      annoWrap.select('.top').append('h6').text('   Spike Protein Annotations: ');
 
-      let stackedData = structureData.filter(f=> f.has_unkown == "TRUE").concat(structureData.filter(f=> f.has_unkown == "FALSE"));
+      renderStructureKnowns(topCommentWrap);
+
+      let stackedData = structureSelected.annotations.filter(f=> f.has_unkown == "TRUE").concat(structureSelected.annotations.filter(f=> f.has_unkown == "FALSE"));
       let annos = topCommentWrap.selectAll('.anno').data(stackedData).join('div').classed('anno', true);
 
       let unknowns = annos.filter(f=> f.has_unkown === 'TRUE');
@@ -237,7 +231,7 @@ export async function mouseClickVideo(coord, video){
       selectedComWrap.append('h7').text("Associated Comments: ");
 
   //MIGHT BE REPEATING WORK - ALREADY HAVE UPDATE COMMENT SIDEBAR ABOVE
-      drawCommentBoxes(test, selectedComWrap);
+      drawCommentBoxes(structureSelected.comments, selectedComWrap);
       drawCommentBoxes(nestReplies, genComWrap);
       genComWrap.selectAll('.memo').style('opacity', 0.3);
     }
@@ -249,7 +243,7 @@ function structureTooltip(structureData, coord, snip, hoverBool){
 
   let nestReplies = formatCommentData(Object.assign({}, commentData), null);
 
-      let test = nestReplies.filter((f)=> {
+      let structureComments = nestReplies.filter((f)=> {
         if(colorDictionary[snip].structure[1]){
           return f.comment.toUpperCase().includes(colorDictionary[snip].structure[0].toUpperCase()) || f.comment.toUpperCase().includes(colorDictionary[snip].structure[1].toUpperCase);
         }else{
@@ -258,8 +252,8 @@ function structureTooltip(structureData, coord, snip, hoverBool){
       });
   if(hoverBool){
 
-    let question = structureData.filter(f=> f.has_unkown === "TRUE").length + test.filter(f=> f.comment.includes('?')).length;
-    let refs = structureData.filter(f=> f.url != "").length + test.filter(f=> f.comment.includes('http')).length;
+    let question = structureData.filter(f=> f.has_unkown === "TRUE").length + structureComments.filter(f=> f.comment.includes('?')).length;
+    let refs = structureData.filter(f=> f.url != "").length + structureComments.filter(f=> f.comment.includes('http')).length;
 
     d3.select('.tooltip')
     .style('position', 'absolute')

@@ -1,10 +1,10 @@
 import * as d3 from 'd3';
-import { clearBoard, clearRightSidebar, formatCommenting, renderCommentDisplayStructure, updateCommentSidebar  } from './commentBar';
+import { clearBoard, clearRightSidebar, formatCommenting, renderCommentDisplayStructure, renderStructureKnowns, updateCommentSidebar  } from './commentBar';
 require("regenerator-runtime/runtime");
 import firebase from 'firebase/app';
 import { checkDatabase } from '../firebaseUtil';
 import { dataKeeper } from '../dataManager';
-import { clearCanvas } from './imageDataUtil';
+import { clearCanvas, structureSelected, structureSelectedToggle } from './imageDataUtil';
 import { updateAnnotationSidebar } from './annotationBar';
 import { annotationData } from '..';
 require('firebase/auth');
@@ -59,13 +59,22 @@ export function goBackButton(){
     let button = d3.select('#top-bar').select('.add-comment').select('button')
     button.text('Go back');
     button.on('click', (event)=> {
-        clearRightSidebar();
-        renderCommentDisplayStructure();
-        updateCommentSidebar(dataKeeper[dataKeeper.length - 1]);
-        updateAnnotationSidebar(annotationData[annotationData.length - 1], null, null);
-        addCommentButton();
-        clearCanvas();
-        d3.select('.tooltip').style('opacity', 0);
+        console.log('button clicked', structureSelected);
+        if(structureSelected.structure != null && d3.select('#right-sidebar').select('.top').select('.found-info').empty()){
+            d3.select('#right-sidebar').select('.top').selectAll('*').remove();
+            renderStructureKnowns(d3.select('#comment-wrap').select('.top'));
+            
+        }else{
+           structureSelectedToggle(null);
+           clearRightSidebar();
+           renderCommentDisplayStructure();
+           updateCommentSidebar(dataKeeper[dataKeeper.length - 1]);
+           updateAnnotationSidebar(annotationData[annotationData.length - 1], null, null);
+           addCommentButton();
+           clearCanvas();
+           d3.select('.tooltip').style('opacity', 0);
+        }
+       
     });
 }
 

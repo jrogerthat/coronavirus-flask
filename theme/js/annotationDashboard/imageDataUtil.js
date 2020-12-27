@@ -1,7 +1,20 @@
 export const endDrawTime = 84;
+
 export const structureSelected = {
   selected: false,
-  structure: null
+  structure: null,
+  annotations: null,
+  comments: null
+}
+
+export function structureSelectedToggle(datum){
+  structureSelected.structure = datum;
+  
+  if(datum === null){
+    structureSelected.annotations = null;
+    structureSelected.comments = null;
+    structureSelected.selected = false;
+  }
 }
 
 export const colorDictionary = {
