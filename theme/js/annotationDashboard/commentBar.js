@@ -264,19 +264,13 @@ export function renderStructureKnowns(topCommentWrap, snip, structureData, quest
     <br>
     `)
 
-    console.log('structure data in render structure', structureData)
-
     topCommentWrap.append('button')
       .classed("btn btn-outline-secondary add-comment-structure", true)
-      .text("Add comment for this structure TEST")
+      .text("Add comment for this structure")
       .on('click', (event, d)=> {
-
-        console.log('render structssss',structs);
-    
         topCommentWrap.selectAll('*').remove();
         let structArray = [structs.toString()];
         formatCommenting(topCommentWrap, structArray);
-
       });
 }
 
@@ -297,9 +291,6 @@ export function defaultTemplate(div, defaultTags){
     inputDiv.append('div').classed('temp-text', true).html(templatehtml);
 
     inputDiv.append('textarea').attr('id', 'text-area-id').attr('placeholder', 'Comment Here');
-    //let tagButton = dropDown(inputDiv, tagOptions, 'Tag', 'tag-drop');
-
-    //let defaultTags = []
 
     addTagFunctionality(inputDiv, defaultTags);
 
@@ -688,34 +679,34 @@ export function formatComment2Send(user, currentTime, mark, tag, coords, replyTo
 
 export function formatCommenting(div, startingTags){
 
-    let dropId = 'comment-type';
+    // let dropId = 'comment-type';
 
     let templateWrap = div.append('div').classed('template-wrap', true);
 
-    let dropdiv = div.append('div').classed(`dropdown ${dropId}`, true);
+    // let dropdiv = div.append('div').classed(`dropdown ${dropId}`, true);
  
-    let button = dropdiv.append('button');
-    button.classed('btn dropbtn dropdown-toggle', true);
-    button.attr('value', 'other');
-    button.text('Add Category Tag');
+    // let button = dropdiv.append('button');
+    // button.classed('btn dropbtn dropdown-toggle', true);
+    // button.attr('value', 'other');
+    // button.text('Add Category Tag');
     
-    let dropContent = dropdiv.append('div').attr('id', dropId).classed('dropdown-content', true);
-    dropContent.append('a').text('text').attr('font-size', 11);
-    let options = dropContent.selectAll('a').data(tagOptions).join('a').text(d=> d.key);
+    // let dropContent = dropdiv.append('div').attr('id', dropId).classed('dropdown-content', true);
+    // dropContent.append('a').text('text').attr('font-size', 11);
+    // let options = dropContent.selectAll('a').data(tagOptions).join('a').text(d=> d.key);
 
-    options.on('click', (event, d)=> {
-        let testToo = button.text(d.key);
-        button.nodes()[0].value = d.key;
-        dropContent.classed('show', false);
-    });
+    // options.on('click', (event, d)=> {
+    //     let testToo = button.text(d.key);
+    //     button.nodes()[0].value = d.key;
+    //     dropContent.classed('show', false);
+    // });
    
-    button.on('click', (event)=> {
-        if(dropContent.classed('show')){
-            dropContent.classed('show', false);
-        }else{
-            dropContent.classed('show', true);
-        }
-    });
+    // button.on('click', (event)=> {
+    //     if(dropContent.classed('show')){
+    //         dropContent.classed('show', false);
+    //     }else{
+    //         dropContent.classed('show', true);
+    //     }
+    // });
 
     defaultTemplate(div, startingTags);
     

@@ -338,6 +338,14 @@ margin-top:10px;
   fill:#FE0900 !important;
 }
 
+.found-info{
+  height:200px;
+}
+
+.add-comment-structure{
+  margin:10px;
+}
+
 
 #video-controls{
   position: absolute;
@@ -665,6 +673,16 @@ input:checked + .slider:before {
   font-size:11px;
  }
 
+ ////radio button starts here
+.time-tabber, .media-tabber{
+  align-self: center;
+  justify-content: center;
+  padding:20px;
+}
+
+#comment-submit-button{
+  margin:20px;
+}
 
  .autocomplete {
   /*the container must be positioned relative:*/

@@ -80,25 +80,3 @@ export function addCommentButton(){
         goBackButton();
     });
 }
-
-// export function addCommentButton(d, event){
-   
-//     if(event.target.value === 'off'){
-//         event.target.value = 'on';
-//         d3.select(event.target).text('Go back');
-//         let sideWrap = d3.select('#right-sidebar').select('#comment-wrap');
-//         // sideWrap.selectAll('*').remove();
-//         clearRightSidebar();
-//         d3.select('#interaction').style('pointer-events', 'all');
-//         //formatTimeControl(sideWrap);
-//          formatCommenting(sideWrap);
-
-//     }else{
-//         clearBoard();
-//         event.target.value = 'off';
-//         d3.select(event.target).text('Add Comment');
-//         d3.select('#right-sidebar').select('#comment-wrap').selectAll('*').remove();
-//         d3.select('#interaction').style('pointer-events', 'all');
-//         checkDatabase([updateCommentSidebar]);
-//     }
-// }
