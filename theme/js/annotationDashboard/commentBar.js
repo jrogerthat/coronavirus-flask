@@ -7,13 +7,14 @@ require('firebase/database');
 
 export function clearRightSidebar(){
     d3.select('#comment-wrap').selectAll('*').remove();
-  }
+}
 
 export function updateCommentSidebar(dbRef){
 
     let wrap = d3.select('#right-sidebar').select('#comment-wrap').select(".general-comm-wrap");
 
-    let nestReplies = formatCommentData(dbRef, null);
+    let nestReplies = formatCommentData(dbRef);
+
     drawCommentBoxes(nestReplies, wrap);
 
 }
@@ -45,14 +46,16 @@ function replyInputBox(d, i, n, user){
 
     submit.on('click', (event)=> {
        
-        event.stopPropagation();//user, currentTime, tag, coords, replyBool, replyTo, mark, initTag, annoBool
-        let dataPush = annotationMaker(user, d3.select('video').node().currentTime, "none", null, true, d.key, "none", "none", false, false);
+        event.stopPropagation();//user, currentTime, mark, tag, coords, replyTo, quote
+        let dataPush = formatComment2Send(user, d3.select('video').node().currentTime, "none", "none", null, d.key, null);
         let ref = firebase.database().ref("comments");               
         ref.push(dataPush);    
     });
 }
 
-export function formatCommentData(dbRef, annotations){
+export function formatCommentData(dbRef){
+
+    console.log('dbreffff', dbRef)
 
     let dataAnno = Object.entries(dbRef.comments)
     .map(m=> {
@@ -63,26 +66,24 @@ export function formatCommentData(dbRef, annotations){
 
     let unresolved = dataAnno.filter(f=> f.resolved === false);
 
-    if(annotations === null){
-
-        let data = unresolved.filter(f=> f.reply === false).sort((a, b)=> a.videoTime - b.videoTime);
+        let data = unresolved.filter(f=> f.replies === "null").sort((a, b)=> a.videoTime - b.videoTime);
     
         let replyData = unresolved.filter(f=> f.reply === true);
     
         let nestReplies = data.map((d, i, n)=>{
         return recurse(d, replyData, 0);
         });
-    
+        console.log(nestReplies);
         return nestReplies;
 
-    }else{
+    // }else{
 
-        let replyData = unresolved.filter(f=> (f.reply === true));
-        let nestReplies = annotations.map((d, i, n)=>{
-        return recurse(d, replyData, 0);
-        });
-        return nestReplies;
-    }
+    //     let replyData = unresolved.filter(f=> (f.reply === true));
+    //     let nestReplies = annotations.map((d, i, n)=>{
+    //     return recurse(d, replyData, 0);
+    //     });
+    //     return nestReplies;
+    // }
 }
 
 export function highlightCommentBoxes(timeRange){
@@ -112,30 +113,8 @@ function updateTags(node, tagWrap, tagArray){
     node.value = "";
 }
 
-function vote(type){
-    let votePush = memoDivs.selectAll('.upvote-span').data(d=> [d]).join('span').classed('upvote-span', true);
-    votePush.selectAll(`.${type}`).data(d=> [d]).join('i').classed('upvote fas fa-thumbs-up fa-sm', true);
-    votePush.selectAll('.up-text').data(d=> [d]).join('text').classed('up-text', true).text(d=> `: ${d.upvote} `);
-
-    votePush.on('click', (event, d)=> {
-        let newUp = ++d.upvote;
-        db.ref(`comments/${d.key}/${type}`).set(`${newUp}`);
-    });
-
-    return votePush;
-
-    // let votePush = memoDivs.selectAll('.upvote-span').data(d=> [d]).join('span').classed('upvote-span', true);
-    // votePush.selectAll('.upvote').data(d=> [d]).join('i').classed('upvote fas fa-thumbs-up fa-sm', true);
-    // votePush.selectAll('.up-text').data(d=> [d]).join('text').classed('up-text', true).text(d=> `: ${d.upvote} `);
-
-    // votePush.on('click', (event, d)=> {
-    //     let newUp = ++d.upvote;
-    //     db.ref(`comments/${d.key}/upvote`).set(`${newUp}`);
-    // });
-}
-
 export function drawCommentBoxes(nestedData, wrap, selectedData){
-
+    console.log('in draw comment boxes', nestedData)
     let memoDivs = wrap.selectAll('.memo').data(nestedData).join('div').classed('memo', true);
     memoDivs.selectAll('.name').data(d=> [d]).join('span').classed('name', true).selectAll('text').data(d=> [d]).join('text').text(d=> `${d.displayName}:`);
     memoDivs.selectAll('.time').data(d=> [d]).join('span').classed('time', true).selectAll('text').data(d=> [d]).join('text').text(d=> {
@@ -268,7 +247,6 @@ export function recurseDraw(selectDiv){
     });
 }
 
-
 export const tagOptions = [
     {key:'question', color:'#2E86C1'}, 
     {key:'suggestion', color:'#2ECC71'}, 
@@ -343,7 +321,7 @@ export function addTagFunctionality(inputDiv, tagArray){
         }
     });
 
-    let array = dataKeeper[dataKeeper.length - 1].comments;
+    let array = [...dataKeeper[dataKeeper.length - 1].comments];
     let test = Object.entries(array).map(m=> m[1]).flatMap(m=> m.tags.split(','));
 
 
@@ -429,19 +407,20 @@ export function doodleSubmit(commentType, user, tags, d, currentTime){
     
       //  let currentTime = document.getElementById('video').currentTime;
         let coords = !d3.select('#push-div').empty() ? [d3.select('#push-div').style('left'), d3.select('#push-div').style('top')] : null;
-    
-        let dataPush = annotationMaker(user, currentTime, tags.data().toString(), coords, false, null, 'doodle', d === null ? 'other' : d.tag, false);
+    //user, currentTime, mark, tag, coords, replyTo, quote
+        let dataPush = formatComment2Send(user, currentTime, 'doodle', tags.data().toString(), coords, null, null);
         dataPush.doodle = true;
         dataPush.doodleName = snapshot.metadata.name;
        
         let refCom = firebase.database().ref(commentType);
                     
         refCom.push(dataPush);
+        
+        clearRightSidebar();
+        renderCommentDisplayStructure();
         checkDatabase([updateCommentSidebar]);
-        clearSidebar();
     });
 }
-
 
 export function clearBoard(){
 
@@ -450,11 +429,11 @@ export function clearBoard(){
 
     context.clearRect(0, 0, canvas.width, canvas.height);
     
-    
     let interactionDiv = d3.select('#interaction');
     interactionDiv.selectAll('*').remove();
 
 }
+
 export function formatCanvas(){
 
     let frame = 'video';
@@ -660,6 +639,31 @@ export function renderCommentDisplayStructure(){
     wrap.append('div').classed('general-comm-wrap', true);
 }
 
+export function formatComment2Send(user, currentTime, mark, tag, coords, replyTo, quote){
+
+    return {
+        uid: user.uid,
+        displayName: user.displayName,
+
+        videoTime: currentTime,
+        postTime: new Date().toString(),
+
+        comment: d3.select('#text-area-id').node().value,
+        commentMark: mark,
+        tags: tag === '' ? 'none' : tag,
+
+        posTop: coords != null ? coords[1] : null,
+        posLeft: coords != null ? coords[0] : null,
+
+        upvote: 0,
+        downvote: 0,
+
+        replies: replyTo === null ? 'null' : replyTo,
+        quotes: quote === null ? 'null' : quote,
+        resolved: false
+    }
+}
+
 export function formatCommenting(div){
 
     let dropId = 'comment-type';
@@ -683,7 +687,6 @@ export function formatCommenting(div){
         dropContent.classed('show', false);
     });
    
-
     button.on('click', (event)=> {
         if(dropContent.classed('show')){
             dropContent.classed('show', false);
@@ -708,7 +711,7 @@ export function formatCommenting(div){
 
     submit.on('click', async (event)=> {
 
-        let user = currentUserKeeper[currentUserKeeper.length -1];
+        let user = currentUser[currentUser.length -1];
         
         event.stopPropagation();
 
@@ -724,12 +727,13 @@ export function formatCommenting(div){
                 let vidHeight =  +d3.select('#push-div').style('top').split('px')[0] / +d3.select('video').node().getBoundingClientRect().height;
 
                 let coords = !d3.select('#push-div').empty() ? [vidWidth, vidHeight] : null;
-               
-                let dataPush = annotationMaker(user, currentTime, tags.data().toString(), coords, false, null, 'push', button.node().value, commentType === "annotations");
+                //user, currentTime, mark, tag, coords, replyTo, quote
+                let dataPush = formatComment2Send(user, currentTime, 'push', tags.data().toString(), coords, null, null);
                 let refCom = firebase.database().ref(commentType);                     
                 refCom.push(dataPush);
-                checkDatabase(firebase.database().ref(), updateSideAnnotations);
-                clearSidebar();
+                clearRightSidebar();
+                renderCommentDisplayStructure();
+                checkDatabase([updateCommentSidebar]);
                 d3.select('#interaction').selectAll("*").remove();
                 
             }else if(form.node().value === 't3'){
@@ -738,12 +742,14 @@ export function formatCommenting(div){
                 d3.select('#interaction').selectAll("*").remove();
 
             }else{
-                let coords = null;
-                let dataPush = annotationMaker(user, currentTime, tags.data().toString(), coords, false, null, 'none', button.node().value, commentType === "annotations");
+                let coords = null; //user, currentTime, mark, tag, coords, replyTo, quote
+                let dataPush = formatComment2Send(user, currentTime, 'none', tags.data().toString(), coords, null, null);
                 let refCom = firebase.database().ref(commentType);                     
                 refCom.push(dataPush);
-                checkDatabase(firebase.database().ref(), updateSideAnnotations);
-                clearSidebar();
+                clearRightSidebar();
+                renderCommentDisplayStructure();
+                checkDatabase([updateCommentSidebar]);
+                
                 d3.select('#interaction').selectAll("*").remove();
             }
 
@@ -838,8 +844,6 @@ function replyRender(replyDivs){
         }
       });
 }
-
-
 
 export function renderNav(div, nav){
 
@@ -984,4 +988,4 @@ function autocomplete(inp, arr) {
       closeAllLists(e.target);
       
   });
-  }
+}

@@ -3,7 +3,7 @@ import { annotationData } from '..';
 import { dataKeeper, formatAnnotationTime, formatTime } from '../dataManager';
 import { addStructureLabelFromButton, addCommentButton, goBackButton } from './topbar'
 import { clearCanvas, colorDictionary, currentImageData, drawFrameOnPause, endDrawTime, getCoordColor, makeNewImageData, parseArray } from './imageDataUtil';
-import { drawCommentBoxes, formatCommentData, updateCommentSidebar, clearRightSidebar, highlightCommentBoxes } from './commentBar';
+import { drawCommentBoxes, formatCommentData, updateCommentSidebar, clearRightSidebar, highlightCommentBoxes, renderCommentDisplayStructure } from './commentBar';
 import { highlightAnnotationbar, updateAnnotationSidebar } from './annotationBar';
 import { highlightTimelineBars } from './timeline';
 import firebase from 'firebase/app';
@@ -149,6 +149,9 @@ export async function mouseMoveVideo(coord, video){
 }
 export async function mouseClickVideo(coord, video){
 
+  let commentData = Object.assign({}, dataKeeper[dataKeeper.length - 1]);
+  console.log('first comment data on mouseclick', commentData);
+
   if(video.playing){
     console.log('is playing');
     structureClicked = false;
@@ -164,7 +167,7 @@ export async function mouseClickVideo(coord, video){
 
       addCommentButton();
 
-      updateCommentSidebar(dataKeeper[dataKeeper.length - 1]);
+      updateCommentSidebar(commentData);
       updateAnnotationSidebar(annotationData[annotationData.length - 1], null, null)
     
       d3.select('.tooltip')
@@ -174,8 +177,9 @@ export async function mouseClickVideo(coord, video){
     }else{
       structureClicked = true;
       parseArray(currentImageData, snip);
+      console.log('commentData in structure', commentData);
 
-      let nestReplies = formatCommentData(dataKeeper[dataKeeper.length -1], null);
+      let nestReplies = formatCommentData(Object.assign({}, commentData), null);
 
       let test = nestReplies.filter((f)=> {
         if(colorDictionary[snip].structure[1]){
@@ -193,13 +197,16 @@ export async function mouseClickVideo(coord, video){
       structureTooltip(structureData, coord, snip, false);
       let annoWrap = d3.select('#left-sidebar');
       
+      clearRightSidebar();
+      renderCommentDisplayStructure();
+      updateCommentSidebar(commentData, test);
       updateAnnotationSidebar(annotationData[annotationData.length - 1], sortedStructureData, null);
       annoWrap.select('.top').append('h6').text('   Spike Protein Annotations: ');
 
       let commentWrap = d3.select('#comment-wrap').select('.top');
       let genComWrap = d3.select('#comment-wrap').select('.general-comm-wrap');
       let selectedComWrap = d3.select('#comment-wrap').select('.selected-comm-wrap');
-      clearRightSidebar();
+     
 
       goBackButton();
       
@@ -215,8 +222,6 @@ export async function mouseClickVideo(coord, video){
       `)
 
       let stackedData = structureData.filter(f=> f.has_unkown == "TRUE").concat(structureData.filter(f=> f.has_unkown == "FALSE"));
-
-      let testData = formatCommentData(dataKeeper[dataKeeper.length -1], stackedData);
 
       let annos = commentWrap.selectAll('.anno').data(stackedData).join('div').classed('anno', true);
 
@@ -234,7 +239,9 @@ export async function mouseClickVideo(coord, video){
 }
 function structureTooltip(structureData, coord, snip, hoverBool){
 
-  let nestReplies = formatCommentData(dataKeeper[dataKeeper.length -1], null);
+  let commentData = Object.assign({}, dataKeeper[dataKeeper.length -1]);
+
+  let nestReplies = formatCommentData(Object.assign({}, commentData), null);
 
       let test = nestReplies.filter((f)=> {
         if(colorDictionary[snip].structure[1]){

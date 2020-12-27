@@ -35,7 +35,7 @@ export function checkDatabase(callbackArray){
   ref.on("value", function(snapshot) {
 
       //extraArgs != null ? callback(snapshot.val(), extraArgs) : callback(snapshot.val());
-      dataKeeper.push(snapshot.val());
+      dataKeeper.push(Object.assign({}, snapshot.val()));
 
       console.log('snapshooot',snapshot.val());
 
