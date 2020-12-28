@@ -24,8 +24,12 @@ function recurse(parent, replyArray, level){
   
     parent.level = level;
     parent.replyBool = false;
+
+    console.log('replyarray', replyArray)
    
-    let replies = replyArray.filter(f=> f.replies.toString() === parent.key);
+    let replies = replyArray.filter(f=> {
+        console.log('reeee', f, f.replies);
+        return f.replies.toString() === parent.key});
   
     if(replies.length > 0){
         parent.replyKeeper = replies;
@@ -39,7 +43,8 @@ function recurse(parent, replyArray, level){
 }
 
 function replyInputBox(d, i, n, user){
-    let inputDiv = d3.select(n[i].parentNode).append('div').classed('text-input-sidebar', true);
+   
+    let inputDiv = d3.select(n.parentNode).append('div').classed('text-input-sidebar', true);
     inputDiv.append('text').text(`${user.displayName}:`)
     inputDiv.append('textarea').attr('id', 'text-area-id').attr('placeholder', 'Comment Here');
    // let tagButton = dropDown(inputDiv, tagOptions, 'Tag', 'tag-drop');
@@ -65,13 +70,13 @@ export function formatCommentData(dbRef){
 
     let unresolved = dataAnno.filter(f=> f.resolved === false);
 
-        let data = unresolved.filter(f=> f.replies === "null").sort((a, b)=> a.videoTime - b.videoTime);
+    let data = unresolved.filter(f=> f.replies === "null").sort((a, b)=> a.videoTime - b.videoTime);
     
-        let replyData = unresolved.filter(f=> f.reply === true);
+    let replyData = unresolved.filter(f=> f.replies != "null");
     
-        let nestReplies = data.map((d, i, n)=>{
+    let nestReplies = data.map((d, i, n)=>{
         return recurse(d, replyData, 0);
-        });
+    });
       
         return nestReplies;
 
