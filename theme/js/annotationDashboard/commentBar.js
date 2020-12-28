@@ -207,7 +207,6 @@ export function drawCommentBoxes(nestedData, wrap, selectedData){
 
       var db = firebase.database();
 
-
       memoDivs.on('click', (event, d)=>{
         
           if(event.target.tagName.toLowerCase() === 'textarea' || 
@@ -491,7 +490,6 @@ export function formatDoodleCanvas(){
     }); 
   
     let canvas = d3.select(div).select('canvas').node();
-   // canvas.setAttribute('id', 'vid-canvas');
   
     const context = canvas.getContext("2d");
     let videoDim = document.getElementById(frame).getBoundingClientRect();
@@ -556,18 +554,17 @@ export function formatPush(){
 
     clearBoard();
 
-    let canvas = d3.select('canvas').node()
-    canvas.height = 0;
-    canvas.width = 0;
-   
-    let interactionDiv = d3.select('#interaction');
+    let interactionDiv = d3.select('#video-wrap').append('div').attr('id', 'add-mark');
+    let video = document.getElementById('video');
+    interactionDiv.node().style.width = Math.round(video.videoWidth)+'px';
+    interactionDiv.node().style.height = video.videoHeight+'px';
 
     let clickedBool = false;
 
-    if(d3.select('.add-comment').select('button').node().value === 'on' && d3.select('.media-tabber').node().value === 't2'){
+    if(d3.select('.media-tabber').node().value === 't2'){
 
         interactionDiv.on('mouseenter', function(event){
-            let coords = d3.pointer(this);
+            let coords = d3.pointer(event);
     
             //interactionDiv.classed('crosshair', true);
             if(d3.select('#push-div').empty() && !d3.select('.media-tabber').empty() && d3.select('.media-tabber').node().value === 't2'){
@@ -582,7 +579,7 @@ export function formatPush(){
     
         interactionDiv.on('mousemove', function(event) {
     
-            let coords = d3.pointer(this);
+            let coords = d3.pointer(event);
             let pushDiv = d3.select('#push-div');
             if(!pushDiv.empty() && !clickedBool){
                 pushDiv.style('top', (d)=> (coords[1]-10)+'px');
@@ -634,8 +631,6 @@ export function noMarkFormat(){
     const context = canvas.getContext('2d');
 
     context.clearRect(0, 0, canvas.width, canvas.height);
-    canvas.height = 0;
-    canvas.width = 0;
    
     let interactionDiv = d3.select('#interaction');
     interactionDiv.selectAll('*').remove();
@@ -694,16 +689,21 @@ export function formatCommenting(div, startingTags){
     submit.on('click', async (event)=> {
 
         let user = currentUser[currentUser.length -1];
+
+        const context = canvas.getContext("2d");
+        let videoDim = document.getElementById('video').getBoundingClientRect();
+        
+        // canvas.width = videoDim.width;
+        // canvas.height = videoDim.height;
         
         event.stopPropagation();
 
         if(d3.select('#text-area-id').node().value != ''){
 
             let tags = d3.select('.tag-wrap').selectAll('.badge');
-      
             let currentTime = document.getElementById('video').currentTime;
 
-            d3.select('#interaction').style('pointer-events', 'all');
+           // d3.select('#interaction').style('pointer-events', 'all');
 
             if(form.node().value === 't2'){
                 
@@ -717,7 +717,7 @@ export function formatCommenting(div, startingTags){
                 clearRightSidebar();
                 renderCommentDisplayStructure();
                 checkDatabase([updateCommentSidebar]);
-                d3.select('#interaction').selectAll("*").remove();
+                d3.select('#add-mark').remove();
                 
             }else if(form.node().value === 't3'){
 
@@ -728,10 +728,8 @@ export function formatCommenting(div, startingTags){
                 const context = canvas.getContext('2d');
                 context.clearRect(0, 0, canvas.width, canvas.height);
                 
-                
-                
-
             }else{
+
                 let coords = null; //user, currentTime, mark, tag, coords, replyTo, quote
                 let dataPush = formatComment2Send(user, currentTime, 'none', tags.data().toString(), coords, null, null);
                 let refCom = firebase.database().ref(commentType);                     
@@ -739,8 +737,8 @@ export function formatCommenting(div, startingTags){
                 clearRightSidebar();
                 renderCommentDisplayStructure();
                 checkDatabase([updateCommentSidebar]);
-                
-                d3.select('#interaction').selectAll("*").remove();
+                d3.select('#add-mark').remove();
+               
             }
 
             d3.select('.add-comment').select('button').text('Add Comment');
