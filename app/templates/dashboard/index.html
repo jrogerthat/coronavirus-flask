@@ -14,13 +14,34 @@
     <div id="wrapper">
       <div id="top-bar">
         <div id="user"></div> 
-        <div id="toggle-wrap">
-          <span>Sort by questions</span>
-          <div  id="toggle"><!-- Rounded switch -->
-            <label class="switch">
+
+        <div id="toggle-sort-wrap">
+            <div>
+              <label class="switch" id="sort-by">
+                <span class="label">Sort by open questions</span>
+                <input type="checkbox">
+                <span class="slider round"></span>
+              </label>
+            </div>
+        </div>
+
+        <div id="toggle-show-wrap">
+          <div>
+            <label class="switch" id="show-doodle">
+              <span class="label">Show drawing</span>
               <input type="checkbox">
               <span class="slider round"></span>
-            </label></div>
+            </label>
+          </div>
+          
+          <div>
+            <label class="switch" id="show-push">
+              <span class="label">Show push mark</span>
+              <input type="checkbox">
+              <span class="slider round"></span>
+            </label>
+          </div>
+         
         </div>
        
         <div class="add-comment"><button class="btn btn-outline-secondary btn-sm" value="off">Add Comment</button></div>
