@@ -56,13 +56,6 @@ async function init(){
     addCommentButton();
     d3.select('#sort-by').select('input').on('click', (event)=> toggleSort(event));
 
-    d3.select('#show-doodle').select('input').on('click', (event)=> {
-        console.log(event.target, event.target.checked);
-
-    });
-    d3.select('#show-push').select('input').on('click', (event)=> {
-
-    });
 }
 
 

@@ -162,7 +162,7 @@ export async function mouseClickVideo(coord, video){
     if(snip === "black" || snip === "unknown"){
      
       structureSelectedToggle(null);
-      console.log('structure', structureSelected);
+     
    
       togglePlay();
       addCommentButton();
@@ -287,11 +287,19 @@ export async function videoUpdates(data, annoType){
    
   let interDIV = d3.select('#interaction');
 
-  d3.select('.show-comments').select('.form-check').select('input').on('click', (d, i, n)=> {
-      if(!n[i].checked){
-          d3.select('#interaction').selectAll('*').remove();
+  d3.select('#show-doodle').select('input').on('click', (event, d)=> {
+      if(!event.target.checked){
+          console.log('checked erase canvas');
+          d3.select('#interaction').selectAll('.doodles').remove();
+          
       }
   });
+
+  d3.select('#show-push').select('input').on('click', (event, d)=> {
+    if(event.target.checked){
+       d3.select('#interaction').selectAll('*').remove();
+    }
+});
 
   video.ontimeupdate = async (event) => {
 
@@ -299,61 +307,57 @@ export async function videoUpdates(data, annoType){
 
     highlightTimelineBars(timeRange);
 
-    let filteredData = annotationData[annotationData.length - 1]
+    let filteredAnnotations = annotationData[annotationData.length - 1]
         .filter(f=> f.seconds[0] <= timeRange[0] && f.seconds[0] <= timeRange[1]) || (f.seconds[1] <= timeRange[1] && f.seconds[1] >= timeRange[0]);
     
-    updateAnnotationSidebar(filteredData, null);
+    /**
+     * UPDATE AND HIGHLGIHT ANNOTATION BAR
+     */
+    updateAnnotationSidebar(filteredAnnotations, null);
     highlightAnnotationbar(video.currentTime);
  
    /*
     COMMENT MANIPULATION HERE
    */
-    let commentData = Object.entries(dataKeeper[dataKeeper.length - 1].comments).map(m=> m[1]);
- 
-    let annoTest = commentData.filter((f,i)=> {
-        let time = JSON.parse(f.videoTime)
+
+    highlightCommentBoxes(timeRange);
+
+    let commentData = Object.entries(dataKeeper[dataKeeper.length - 1].comments).map(m=> m[1]).filter(f=> f.replies ===   "null");
+    
+    let commentsInTimeframe = commentData.filter((f,i)=> {
+      
+        let time = JSON.parse(f.videoTime);
         if(time.length > 1){
             return time[0] <= video.currentTime && time[1] >= video.currentTime;
         }else{
-            return time[0] < timeRange[1] && time[0] > timeRange[0];
+            return time <= timeRange[1] && time >= timeRange[0];
         }
     });
 
-    highlightCommentBoxes(timeRange);
- 
-    let memoCirc = d3.select('#annotation-layer').selectAll('.memo');
-    memoCirc.classed('selected', false);
-    let filtered = memoCirc.filter(f=> f.videoTime < timeRange[1] && f.videoTime > timeRange[0]).classed('selected', true);
+    console.log('comment', commentsInTimeframe);
 
-  
-   
-    let filteredPushes = filtered.filter(f=> {
-        return f.commentMark === 'push';
-    });
- 
-    let filteredDoodles = filtered.filter(f=> {
-        return f.commentMark === 'doodle';
-    });
- 
-    let doodleData = filteredDoodles.data();
- 
-    let test = doodleData.map(async (dood)=> {
-        let urlDood = await doods.items.filter(f=>f.location['path'] === `images/${dood.doodleName}`)[0].getDownloadURL();
+    let pushes = commentsInTimeframe.filter(f => f.commentMark === "push");
+    let doodles = commentsInTimeframe.filter(f => f.commentMark === "doodle");
+
+    let doodFromStorage = doodles.map(async (dood)=> {
+        let urlDood = await doods.items.filter(f=>f._delegate._location.path_ === `images/${dood.doodleName}`)[0].getDownloadURL();
         return urlDood;
     });
+
+    console.log('doodFromStorage', doodFromStorage);
  
-    let annoDoodles = annoTest.filter(f=> f.commentMark === "doodle").map(async (dood)=> {
-        let urlDood = await doods.items.filter(f=>f.location['path'] === `images/${dood.doodleName}`)[0].getDownloadURL();
-        return urlDood;
-    });
+    // let annoDoodles = commentsInTimeframe.filter(f=> f.commentMark === "doodle").map(async (dood)=> {
+    //     let urlDood = await doods.items.filter(f=>f.location['path'] === `images/${dood.doodleName}`)[0].getDownloadURL();
+    //     return urlDood;
+    // });
  
     //if(d3.select('.show-comments').select('.form-check').select('.form-check-input').node().checked){
        
-        let images = interDIV.selectAll('.doodles').data(await Promise.all(test)).join('img').classed('doodles', true);
+        let images = interDIV.selectAll('.doodles').data(await Promise.all(doodFromStorage)).join('img').classed('doodles', true);
         images.attr('src', d=> d);
  
-        let annoImages = interDIV.selectAll('.anno-doodles').data(await Promise.all(annoDoodles)).join('img').classed('anno-doodles', true);
-        annoImages.attr('src', d=> d);
+        // let annoImages = interDIV.selectAll('.anno-doodles').data(await Promise.all(annoDoodles)).join('img').classed('anno-doodles', true);
+        // annoImages.attr('src', d=> d);
  
         let pushedG = svg.selectAll('g.pushed').data(filteredPushes.data()).join('g').classed('pushed', true);
         
@@ -383,7 +387,7 @@ export async function videoUpdates(data, annoType){
  
        // d3.select('#comment-sidebar').select('#annotation-wrap').node().scrollTop -= 60;
 
-        let annotationGroup = svg.selectAll('g.annotations').data(annoTest).join('g').classed('annotations', true);
+        let annotationGroup = svg.selectAll('g.annotations').data(commentsInTimeframe).join('g').classed('annotations', true);
         let annotationMark = annotationGroup.filter(f=> f.commentMark === 'push').selectAll('circle').data(d=> [d]).join('circle').attr('r', 5).attr('cx', d=> d.posLeft).attr('cy',d=>  d.posTop);
         let annotationText = annotationGroup.selectAll('text').data(d=> [d]).join('text')
         .text(d=> d.comment)
