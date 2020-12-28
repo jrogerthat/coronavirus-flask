@@ -455,7 +455,11 @@ export function formatDoodleCanvas(){
 
     clearBoard();
 
-    let interactionDiv = d3.select('#interaction');
+    //let interactionDiv = d3.select('#interaction');
+    let interactionDiv = d3.select('#video-wrap').append('div').attr('id', 'add-mark');
+    let video = document.getElementById('video');
+    interactionDiv.node().style.width = Math.round(video.videoWidth)+'px';
+    interactionDiv.node().style.height = video.videoHeight+'px';
 
     interactionDiv.on('mouseenter', function(event){
 
@@ -502,7 +506,6 @@ export function formatDoodleCanvas(){
     var draw=false;
   
     div.onmousedown=function(e) {
-          interactionDiv.style('pointer-events', 'none');
           let sideWidth = document.getElementById('right-sidebar').getBoundingClientRect();
   
           oldX = (e.pageX - (sideWidth.width + 11));
@@ -543,7 +546,7 @@ export function formatDoodleCanvas(){
 
        doodleKeeper.push({index:listPromis.items.length, data:message});
 
-      }
+    }
   
       return div;
   
@@ -673,34 +676,8 @@ export function formatComment2Send(user, currentTime, mark, tag, coords, replyTo
 
 export function formatCommenting(div, startingTags){
 
-    // let dropId = 'comment-type';
 
     let templateWrap = div.append('div').classed('template-wrap', true);
-
-    // let dropdiv = div.append('div').classed(`dropdown ${dropId}`, true);
- 
-    // let button = dropdiv.append('button');
-    // button.classed('btn dropbtn dropdown-toggle', true);
-    // button.attr('value', 'other');
-    // button.text('Add Category Tag');
-    
-    // let dropContent = dropdiv.append('div').attr('id', dropId).classed('dropdown-content', true);
-    // dropContent.append('a').text('text').attr('font-size', 11);
-    // let options = dropContent.selectAll('a').data(tagOptions).join('a').text(d=> d.key);
-
-    // options.on('click', (event, d)=> {
-    //     let testToo = button.text(d.key);
-    //     button.nodes()[0].value = d.key;
-    //     dropContent.classed('show', false);
-    // });
-   
-    // button.on('click', (event)=> {
-    //     if(dropContent.classed('show')){
-    //         dropContent.classed('show', false);
-    //     }else{
-    //         dropContent.classed('show', true);
-    //     }
-    // });
 
     defaultTemplate(div, startingTags);
     
@@ -726,13 +703,14 @@ export function formatCommenting(div, startingTags){
       
             let currentTime = document.getElementById('video').currentTime;
 
+            d3.select('#interaction').style('pointer-events', 'all');
+
             if(form.node().value === 't2'){
                 
                 let vidWidth =  +d3.select('#push-div').style('left').split('px')[0] / +d3.select('video').node().getBoundingClientRect().width;
                 let vidHeight =  +d3.select('#push-div').style('top').split('px')[0] / +d3.select('video').node().getBoundingClientRect().height;
 
                 let coords = !d3.select('#push-div').empty() ? [vidWidth, vidHeight] : null;
-                //user, currentTime, mark, tag, coords, replyTo, quote
                 let dataPush = formatComment2Send(user, currentTime, 'push', tags.data().toString(), coords, null, null);
                 let refCom = firebase.database().ref(commentType);                     
                 refCom.push(dataPush);
@@ -744,13 +722,13 @@ export function formatCommenting(div, startingTags){
             }else if(form.node().value === 't3'){
 
                 doodleSubmit(commentType, user, tags, currentTime);
-                d3.select('#interaction').selectAll("*").remove();
+                d3.select('#add-mark').remove();
 
                 let canvas = d3.select('canvas').node();
                 const context = canvas.getContext('2d');
                 context.clearRect(0, 0, canvas.width, canvas.height);
                 
-                d3.select('#interaction').style('pointer-events', 'all');
+                
                 
 
             }else{
