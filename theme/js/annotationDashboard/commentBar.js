@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { currentUser, dataKeeper, formatVideoTime } from '../dataManager';
 import firebase from 'firebase/app';
 import { checkDatabase } from '../firebaseUtil';
-import { colorDictionary, structureSelected } from './imageDataUtil';
+import { colorDictionary, structureSelected, doodleKeeper } from './imageDataUtil';
 require('firebase/auth');
 require('firebase/database');
 
@@ -319,7 +319,6 @@ export function addTagFunctionality(inputDiv, tagArray){
 
     }
     
-    
     let tagText = inputWrap.append('input').attr('id', 'tag-input');
     tagText.classed('form-control', true);
     tagText.node().type = 'text';
@@ -340,7 +339,6 @@ export function addTagFunctionality(inputDiv, tagArray){
 
     let array = Object.assign({}, dataKeeper[dataKeeper.length - 1]).comments;
     let test = Object.entries(array).map(m=> m[1]).flatMap(m=> m.tags.split(','));
-
 
     autocomplete(node, Array.from(new Set(test)));
 }
@@ -411,7 +409,7 @@ export function radioBlob(div, t1Ob, t2Ob, t3Ob, className){
 
 }
 
-export function doodleSubmit(commentType, user, tags, d, currentTime){
+export function doodleSubmit(commentType, user, tags, currentTime){
 
     var storage = firebase.storage();
     var storageRef = storage.ref();
@@ -450,19 +448,19 @@ export function clearBoard(){
 
 }
 
-export function formatCanvas(){
+export function formatDoodleCanvas(){
 
     let frame = 'video';
-    let div = document.getElementById('main-wrap');
+    let div = document.getElementById('main');
 
     clearBoard();
 
     let interactionDiv = d3.select('#interaction');
+
     interactionDiv.on('mouseenter', function(event){
 
-        let coords = d3.pointer(this);
+        let coords = d3.pointer(event);
 
-        //interactionDiv.classed('crosshair', true);
         if(d3.select('#push-div').empty() && d3.select('.media-tabber').node().value === 't3'){
             let pushDiv = interactionDiv.append('div').attr('id', 'push-div');
             pushDiv.style('position', 'absolute')
@@ -476,24 +474,20 @@ export function formatCanvas(){
     let leftSpace = d3.select('#left-sidebar').node().getBoundingClientRect().width;
 
     interactionDiv.on('mousemove', function(event) {
-        let coords = d3.pointer(this);
+        let coords = d3.pointer(event);
         let pushDiv = d3.select('#push-div');
         if(!pushDiv.empty()){
-            // pushDiv.style('top', (d)=> (coords[1]-10)+'px');
-            // pushDiv.style('left', (d)=> (coords[0]-10)+'px');
             pushDiv.style('top', (d)=> (coords[1])+'px');
             pushDiv.style('left', (d)=> (coords[0])+'px');
         }
     });
 
     interactionDiv.on('mouseleave', function(){
-        
         d3.select('#push-div').remove();
-        
     }); 
   
     let canvas = d3.select(div).select('canvas').node();
-    canvas.setAttribute('id', 'vid-canvas');
+   // canvas.setAttribute('id', 'vid-canvas');
   
     const context = canvas.getContext("2d");
     let videoDim = document.getElementById(frame).getBoundingClientRect();
@@ -508,7 +502,7 @@ export function formatCanvas(){
     var draw=false;
   
     div.onmousedown=function(e) {
-  
+          interactionDiv.style('pointer-events', 'none');
           let sideWidth = document.getElementById('right-sidebar').getBoundingClientRect();
   
           oldX = (e.pageX - (sideWidth.width + 11));
@@ -535,7 +529,7 @@ export function formatCanvas(){
         }
       
     }
-    div.onmouseup= async function(e) {
+    div.onmouseup = async function(e) {
         draw=false;
        // shapeArray.push(context.save());
 
@@ -564,9 +558,6 @@ export function formatPush(){
     canvas.width = 0;
    
     let interactionDiv = d3.select('#interaction');
-    
-   // interactionDiv.style('width', `${document.getElementById('video').getBoundingClientRect().width}px`);
-   // interactionDiv.style('height', `${document.getElementById('video').getBoundingClientRect().height}px`);
 
     let clickedBool = false;
 
@@ -715,7 +706,7 @@ export function formatCommenting(div, startingTags){
     
     let t1Ob = {label: "No spatial reference", callBack: noMarkFormat};
     let t2Ob = {label: "Mark a Point", callBack: formatPush};
-    let t3Ob = {label: "Draw", callBack: formatCanvas};
+    let t3Ob = {label: "Draw", callBack: formatDoodleCanvas};
 
     let form = radioBlob(div, t1Ob, t2Ob, t3Ob, 'media-tabber');
     noMarkFormat();
@@ -752,8 +743,15 @@ export function formatCommenting(div, startingTags){
                 
             }else if(form.node().value === 't3'){
 
-                doodleSubmit(commentType, user, tags, button.node().value, currentTime);
+                doodleSubmit(commentType, user, tags, currentTime);
                 d3.select('#interaction').selectAll("*").remove();
+
+                let canvas = d3.select('canvas').node();
+                const context = canvas.getContext('2d');
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                
+                d3.select('#interaction').style('pointer-events', 'all');
+                
 
             }else{
                 let coords = null; //user, currentTime, mark, tag, coords, replyTo, quote
@@ -887,7 +885,7 @@ export function toggleMagic(){
     .on('click', (event, d)=> {
        
         if(event.target.value === "draw"){
-            formatCanvas();
+            formatDoodleCanvas();
         }else{
             //annotateCircle();
             formatPush();
