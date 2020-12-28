@@ -25,10 +25,10 @@ function recurse(parent, replyArray, level){
     parent.level = level;
     parent.replyBool = false;
 
-    console.log('replyarray', replyArray)
+ 
    
     let replies = replyArray.filter(f=> {
-        console.log('reeee', f, f.replies);
+        
         return f.replies.toString() === parent.key});
   
     if(replies.length > 0){
@@ -96,7 +96,8 @@ export function highlightCommentBoxes(timeRange){
     let selectedMemoDivs = memoDivs.filter(f=> {
         return f.videoTime <= timeRange[1] && f.videoTime >= timeRange[0]}).classed('selected', true);
     if(!selectedMemoDivs.empty()){
-        selectedMemoDivs.nodes()[0].scrollIntoView({behavior: "smooth"});
+        //selectedMemoDivs.nodes()[0].scrollIntoView({behavior: "smooth"});
+        selectedMemoDivs.nodes()[0].scrollIntoView();
     }
 }
 
@@ -573,7 +574,7 @@ export function formatPush(){
     
             if(d3.select('#push-div').empty()){
                 let dims = interactionDiv.node().getBoundingClientRect();
-                console.log(dims);
+                
                 let pushDiv = interactionDiv.append('div').attr('id', 'push-div');
                 pushDiv.style('position', 'absolute')
                 pushDiv.style('top', (d)=> (coords[1]-(dims.top - 50))+'px')
