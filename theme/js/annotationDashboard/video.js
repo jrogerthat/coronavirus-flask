@@ -7,11 +7,9 @@ import { drawCommentBoxes, formatCommentData, updateCommentSidebar, clearRightSi
 import { highlightAnnotationbar, updateAnnotationSidebar } from './annotationBar';
 import { highlightTimelineBars } from './timeline';
 import firebase from 'firebase/app';
-//import firebase from 'firebase';
 import 'firebase/storage';
 
 let canPlay;
-
 
 const currentColorCodes = [];
 
@@ -82,7 +80,6 @@ function updateTimeElapsed() {
   d3.select('.progress-bar-fill').style('width', scaleVideoTime(document.getElementById('video').currentTime)+'px');
 }
 function progressClicked(mouse){
-
   document.getElementById('video').currentTime = Math.round(scaleVideoTime(mouse.offsetX, true));
   updateTimeElapsed();
 }
@@ -124,9 +121,10 @@ export function togglePlay() {
 }
 
 export async function mouseMoveVideo(coord, video){
+  console.log(structureSelected.selected)
   if(video.playing){
     console.log('video playing');
-  }else if(structureSelected.selected || video.currentTime >= endDrawTime){
+  }else if(structureSelected.selected === true || video.currentTime >= endDrawTime){
     console.log('what this do');
   }else{
 
@@ -152,11 +150,7 @@ export async function mouseClickVideo(coord, video){
   let commentData = Object.assign({}, dataKeeper[dataKeeper.length - 1]);
 
   if(video.playing){
-    console.log('is playing');
-
-    structureSelectedToggle(null);
-    console.log('structure', structureSelected);
-    
+    structureSelectedToggle(null);    
     togglePlay();
 
   }else{ 
@@ -185,7 +179,6 @@ export async function mouseClickVideo(coord, video){
       /**
        * VIDEO PAUSED - CLICKED ON STRUCTURE
        */
-    
       structureSelectedToggle(colorDictionary[snip].structure[0]);
       parseArray(currentImageData, snip);
     

@@ -9,11 +9,13 @@ export const structureSelected = {
 
 export function structureSelectedToggle(datum){
   structureSelected.structure = datum;
-  
+
   if(datum === null){
     structureSelected.annotations = null;
     structureSelected.comments = null;
     structureSelected.selected = false;
+  }else{
+    structureSelected.selected = true;
   }
 }
 
