@@ -378,12 +378,18 @@ margin-top:10px;
   height:auto;
 }
 
-video, canvas, #interaction, #add-mark{
+video, canvas, #interaction, #add-mark, #interaction svg{
   border-radius: 4px;
   position: absolute;
   top:0;
   left:0;
 }
+
+#interaction svg{
+  width:960px;
+  height: 540px;
+}
+
 
 #video-controls div.progress-bar{
   display: block;

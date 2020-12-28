@@ -56,6 +56,13 @@ export function formatVidPlayer(isInteractive){
         canPlay = true;
         resizeVideoElements();
         drawFrameOnPause(video);
+
+            
+      d3.select('#interaction').on('click', (event)=> mouseClickVideo(d3.pointer(event), video))
+          .on('mousemove', (event)=> mouseMoveVideo(d3.pointer(event), video));
+
+      d3.select('#video-controls').select('.play-pause').on('click', ()=> togglePlay());
+      d3.select('.progress-bar').on('click', progressClicked);
     
       } else {
         video.addEventListener('canplay', canPlay = true);
@@ -65,11 +72,11 @@ export function formatVidPlayer(isInteractive){
     video.addEventListener('timeupdate', updateTimeElapsed);
     video.addEventListener('loadedmetadata', initializeVideo);
     
-    d3.select('#interaction').on('click', (event)=> mouseClickVideo(d3.pointer(event), video))
-                             .on('mousemove', (event)=> mouseMoveVideo(d3.pointer(event), video));
+    // d3.select('#interaction').on('click', (event)=> mouseClickVideo(d3.pointer(event), video))
+    //                          .on('mousemove', (event)=> mouseMoveVideo(d3.pointer(event), video));
 
-    d3.select('#video-controls').select('.play-pause').on('click', ()=> togglePlay());
-    d3.select('.progress-bar').on('click', progressClicked);
+    // d3.select('#video-controls').select('.play-pause').on('click', ()=> togglePlay());
+    // d3.select('.progress-bar').on('click', progressClicked);
 
 }
 function updateTimeElapsed() {
@@ -291,12 +298,11 @@ export async function videoUpdates(data, annoType){
       if(!event.target.checked){
           console.log('checked erase canvas');
           d3.select('#interaction').selectAll('.doodles').remove();
-          
       }
   });
 
   d3.select('#show-push').select('input').on('click', (event, d)=> {
-    if(event.target.checked){
+    if(!event.target.checked){
        d3.select('#interaction').selectAll('*').remove();
     }
 });
@@ -322,7 +328,7 @@ export async function videoUpdates(data, annoType){
 
     highlightCommentBoxes(timeRange);
 
-    let commentData = Object.entries(dataKeeper[dataKeeper.length - 1].comments).map(m=> m[1]).filter(f=> f.replies ===   "null");
+    let commentData = Object.entries(dataKeeper[dataKeeper.length - 1].comments).map(m=> m[1]).filter(f=> f.replies === "null");
     
     let commentsInTimeframe = commentData.filter((f,i)=> {
       
@@ -334,79 +340,72 @@ export async function videoUpdates(data, annoType){
         }
     });
 
-    console.log('comment', commentsInTimeframe);
+    if(d3.select('#show-doodle').select('input').node().checked){
 
-    let pushes = commentsInTimeframe.filter(f => f.commentMark === "push");
-    let doodles = commentsInTimeframe.filter(f => f.commentMark === "doodle");
+      let doodles = commentsInTimeframe.filter(f => f.commentMark === "doodle");
 
-    let doodFromStorage = doodles.map(async (dood)=> {
-        let urlDood = await doods.items.filter(f=>f._delegate._location.path_ === `images/${dood.doodleName}`)[0].getDownloadURL();
-        return urlDood;
-    });
+      let doodFromStorage = doodles.map(async (dood)=> {
+          let urlDood = await doods.items.filter(f=>f._delegate._location.path_ === `images/${dood.doodleName}`)[0].getDownloadURL();
+          return urlDood;
+      });
 
-    console.log('doodFromStorage', doodFromStorage);
- 
-    // let annoDoodles = commentsInTimeframe.filter(f=> f.commentMark === "doodle").map(async (dood)=> {
-    //     let urlDood = await doods.items.filter(f=>f.location['path'] === `images/${dood.doodleName}`)[0].getDownloadURL();
-    //     return urlDood;
-    // });
- 
-    //if(d3.select('.show-comments').select('.form-check').select('.form-check-input').node().checked){
-       
-        let images = interDIV.selectAll('.doodles').data(await Promise.all(doodFromStorage)).join('img').classed('doodles', true);
-        images.attr('src', d=> d);
- 
-        // let annoImages = interDIV.selectAll('.anno-doodles').data(await Promise.all(annoDoodles)).join('img').classed('anno-doodles', true);
-        // annoImages.attr('src', d=> d);
- 
-        let pushedG = svg.selectAll('g.pushed').data(filteredPushes.data()).join('g').classed('pushed', true);
+      let images = interDIV.selectAll('.doodles').data(await Promise.all(doodFromStorage)).join('img').classed('doodles', true);
+      images.attr('src', d=> d);
+    }
+
+    if(d3.select('#show-push').select('input').node().checked){
+      let pushes = commentsInTimeframe.filter(f => f.commentMark === "push");
+
+      let pushedG = svg.selectAll('g.pushed').data(pushes).join('g').classed('pushed', true);
+      pushedG.attr('transform', (d)=> `translate(${(960 * d.posLeft)}, ${(540 * d.posTop)})`);
+
+      console.log('pushes',pushes);
         
-        let circ = pushedG.selectAll('circle').data(d=> [d]).join('circle')
-        circ.attr('r', 10);
-        circ.attr('cx', d=> {
-            return `${(vidDim.width * +d.posLeft) + 10}px`;
-        });
-        circ.attr('cy', d=> {
-            return `${(vidDim.height * +d.posTop) + 10}px`;
-        });
-        circ.attr('fill', 'red');
- 
-        circ.on('mouseover', (d)=>{
- 
-            let wrap = d3.select('#right-sidebar').select('#comment-wrap');
-            let memoDivs = wrap.selectAll('.memo').filter(f=> f.key === d.key);
-            memoDivs.classed('selected', true);
-            memoDivs.nodes()[0].scrollIntoView({behavior: "smooth"});
- 
-        }).on('mouseout', (d)=> {
- 
-            let wrap = d3.select('#right-sidebar').select('#annotation-wrap');
-            let memoDivs = wrap.selectAll('.memo').classed('selected', false);
-            
-        });
- 
-       // d3.select('#comment-sidebar').select('#annotation-wrap').node().scrollTop -= 60;
+      let circ = pushedG.selectAll('circle').data(d=> [d]).join('circle')
+      circ.attr('r', 10);
+      
+      circ.attr('cx', d=> {
+        return 0
+      });
+      circ.attr('cy', d=> {
+        return  0;
+      });
+      circ.attr('fill', 'red');
 
-        let annotationGroup = svg.selectAll('g.annotations').data(commentsInTimeframe).join('g').classed('annotations', true);
-        let annotationMark = annotationGroup.filter(f=> f.commentMark === 'push').selectAll('circle').data(d=> [d]).join('circle').attr('r', 5).attr('cx', d=> d.posLeft).attr('cy',d=>  d.posTop);
-        let annotationText = annotationGroup.selectAll('text').data(d=> [d]).join('text')
-        .text(d=> d.comment)
-        .classed('annotation-label', true)
-        .attr('x', d=> {
-            if(d.commentMark === 'push'){
-                let noPx = parseInt(d.posLeft.replace(/px/,""));
-                return noPx+10+"px";
-            }else{
-                 return '50px'
-            }
-        })
-         .attr('y',d=>  {
-             if(d.commentMark === 'push'){
-                return d.posTop;
-             }else{
-                 return '50px'
-             }
-        });            
-  //  }
+      circ.on('mouseover', (d)=>{
+
+          let wrap = d3.select('#right-sidebar').select('#comment-wrap');
+          let memoDivs = wrap.selectAll('.memo').filter(f=> f.key === d.key);
+          memoDivs.classed('selected', true);
+          memoDivs.nodes()[0].scrollIntoView({behavior: "smooth"});
+
+      }).on('mouseout', (d)=> {
+
+          let wrap = d3.select('#right-sidebar').select('#annotation-wrap');
+          let memoDivs = wrap.selectAll('.memo').classed('selected', false);
+      });
+
+      let annotationGroup = svg.selectAll('g.annotations').data(commentsInTimeframe).join('g').classed('annotations', true);
+      let annotationMark = annotationGroup.filter(f=> f.commentMark === 'push').selectAll('circle').data(d=> [d]).join('circle').attr('r', 5).attr('cx', d=> d.posLeft).attr('cy',d=>  d.posTop);
+      let annotationText = annotationGroup.selectAll('text').data(d=> [d]).join('text')
+      .text(d=> d.comment)
+      .classed('annotation-label', true)
+      .attr('x', d=> {
+        return 0;
+          // if(d.commentMark === 'push'){
+          //     let noPx = parseInt(d.posLeft.replace(/px/,""));
+          //     return noPx+10+"px";
+          // }else{
+          //      return '50px'
+          // }
+      })
+       .attr('y',d=>  {
+           if(d.commentMark === 'push'){
+              return d.posTop;
+           }else{
+               return '50px'
+           }
+      });    
+    }
   };
  }
