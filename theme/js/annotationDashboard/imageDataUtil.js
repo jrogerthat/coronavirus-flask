@@ -17,6 +17,8 @@ export function structureSelectedToggle(datum){
   }
 }
 
+export const doodleKeeper = [];
+
 export const colorDictionary = {
   'blue': {'code':[0, 0, 255], 'structure': ['Cell Membrane']},
   'purple':{'code':[102, 0, 204], 'structure': ['ACE2']},
