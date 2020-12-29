@@ -286,14 +286,23 @@ export function renderStructureKnowns(topCommentWrap){
     <br>
     `)
 
-    topCommentWrap.append('button')
-      .classed("btn btn-outline-secondary add-comment-structure", true)
-      .text("Add comment for this structure")
-      .on('click', (event, d)=> {
-        topCommentWrap.selectAll('*').remove();
-        let structArray = [structureSelected.structure.toString()];
-        formatCommenting(topCommentWrap, structArray);
-      });
+    let infoButton = topCommentWrap.append('button').classed("btn btn-outline-secondary add-comment-structure", true);
+    if(userLoggedIn.loggedInBool){
+        infoButton.text("Add comment for this structure")
+        .on('click', (event, d)=> {
+          topCommentWrap.selectAll('*').remove();
+          let structArray = [structureSelected.structure.toString()];
+          formatCommenting(topCommentWrap, structArray);
+        });
+    }else{
+        infoButton.text("Log in to comment on this")
+        .on('click', (event, d)=> {
+          topCommentWrap.selectAll('*').remove();
+          let structArray = [structureSelected.structure.toString()];
+          formatCommenting(topCommentWrap, structArray);
+        });
+    }
+      
 }
 
 export function defaultTemplate(div, tagArray){
