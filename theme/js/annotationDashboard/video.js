@@ -72,12 +72,6 @@ export function formatVidPlayer(isInteractive){
 
     video.addEventListener('timeupdate', updateTimeElapsed);
     video.addEventListener('loadedmetadata', initializeVideo);
-    
-    // d3.select('#interaction').on('click', (event)=> mouseClickVideo(d3.pointer(event), video))
-    //                          .on('mousemove', (event)=> mouseMoveVideo(d3.pointer(event), video));
-
-    // d3.select('#video-controls').select('.play-pause').on('click', ()=> togglePlay());
-    // d3.select('.progress-bar').on('click', progressClicked);
 
 }
 function updateTimeElapsed() {
@@ -193,7 +187,7 @@ export async function mouseClickVideo(coord, video){
        * VIDEO PAUSED - CLICKED ON STRUCTURE
        */
       structureSelectedToggle(colorDictionary[snip].structure[0]);
-      parseArray(currentImageData, snip);
+      parseArray(snip);
     
       let nestReplies = formatCommentData(Object.assign({}, commentData), null);
 
@@ -235,6 +229,9 @@ export async function mouseClickVideo(coord, video){
       unknowns.classed('unknown', true);
 
       selectedComWrap.append('h7').text("Associated Comments: ");
+
+      topCommentWrap.node().scrollIntoView();
+      annoWrap.select('.top').node().scrollIntoView();
 
   //MIGHT BE REPEATING WORK - ALREADY HAVE UPDATE COMMENT SIDEBAR ABOVE
       drawCommentBoxes(structureSelected.comments, selectedComWrap);

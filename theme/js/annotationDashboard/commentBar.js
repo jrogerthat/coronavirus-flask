@@ -218,7 +218,7 @@ export function drawCommentBoxes(nestedData, wrap, selectedData){
           event.target.tagName.toLowerCase() === 'button' || 
           event.target.tagName.toLowerCase() === 'a' || 
           event.target.tagName.toLowerCase() === 'svg'){
-              console.log('not clicked right');
+              console.log('not clicked on div');
           }else{ 
             commentClicked(event, d);
           }     
