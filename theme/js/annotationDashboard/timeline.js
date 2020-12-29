@@ -133,4 +133,5 @@ export function timelineMouseover(event, d){
 export function timelineMouseout(event, d){
     d3.select(event.target.parentNode).classed('current-hover', false);
     d3.select('#left-sidebar').selectAll('.anno').filter(f=> f.index === d.index).classed('selected', false);
+    d3.select('#timeline-tooltip').style("opacity", 0);
 }
