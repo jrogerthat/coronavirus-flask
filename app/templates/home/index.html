@@ -5,76 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coronavirus Annotation</title>
     <link rel="stylesheet" href="{{url_for('static', filename='bundle.css')}}">
-    <!-- FIREBASE LINKS FOR UI -->
-    <script src="https://www.gstatic.com/firebasejs/ui/4.7.1/firebase-ui-auth.js"></script>
-    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.7.1/firebase-ui-auth.css" />
     <script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-auth.js"></script>
-    <!-- read json file for config -->
-    <script>
-     
-      var firebaseConfig = {
-        apiKey: "{{ apiKey }}",
-        authDomain: "coronavirus-anno-two.firebaseapp.com",
-        databaseURL: "https://coronavirus-anno-two.firebaseio.com",
-        projectId: "coronavirus-anno-two",
-        storageBucket: "coronavirus-anno-two.appspot.com",
-        messagingSenderId: "632575175956",
-        appId: "1:632575175956:web:39364f6d52e14a68892601",
-        measurementId: "G-MF3LEVKHZM"
-      };
-
-      firebase.initializeApp(firebaseConfig);
-
-      var ui = new firebaseui.auth.AuthUI(firebase.default.auth());
-
-      ui.start('#sign-in-container', {
-      callbacks: {
-              signInSuccessWithAuthResult: function(authResult, redirectUrl) {
-                var user = authResult.user;
-                var credential = authResult.credential;
-                var isNewUser = authResult.additionalUserInfo.isNewUser;
-                var providerId = authResult.additionalUserInfo.providerId;
-                var operationType = authResult.operationType;
-
-                // Do something with the returned AuthResult.
-                // Return type determines whether we continue the redirect
-                // automatically or whether we leave that to developer to handle.
-                return true;
-              },
-              
-              signInFailure: function(error) {
-                // Some unrecoverable error occurred during sign-in.
-                // Return a promise when error handling is completed and FirebaseUI
-                // will reset, clearing any UI. This commonly occurs for error code
-                // 'firebaseui/anonymous-upgrade-merge-conflict' when merge conflict
-                // occurs. Check below for more details on this.
-                return handleUIError(error);
-              },
-              uiShown: function() {
-                // The widget is rendered.
-                // Hide the loader.
-                //document.getElementById('loader').style.display = 'none';
-              }
-        },
-        signInFlow: 'popup',
-        signInSuccessUrl:"{{url_for('dashboard.index', user=currentUser)}}",
-        signInOptions: [
-          {
-            provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-            clientId: '632575175956-49a1hie4ab4gr69vak5onr307fg67bb0.apps.googleusercontent.com'
-          },
-          firebase.auth.EmailAuthProvider.PROVIDER_ID,
-          firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID,
-        ],
-        // Other config options...
-      });
-    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  
   </head>
   <body>
-    <div id=sign-in-header><h3>Sign in:</h3></div>
-    <div id="sign-in-container"></div>
+    <div id="wrapper">
+      <div id="top-bar">
+        <div id="user"></div> 
 
+        <div id="toggle-sort-wrap">
+            <div>
+              <label class="switch" id="sort-by">
+                <span class="label">Sort by open questions</span>
+                <input type="checkbox">
+                <span class="slider round"></span>
+              </label>
+            </div>
+        </div>
+
+        <div id="toggle-show-wrap">
+          <div>
+            <label class="switch" id="show-doodle">
+              <span class="label">Show drawing</span>
+              <input type="checkbox" checked=true>
+              <span class="slider round"></span>
+            </label>
+          </div>
+          
+          <div>
+            <label class="switch" id="show-push">
+              <span class="label">Show push mark</span>
+              <input type="checkbox" checked=true>
+              <span class="slider round"></span>
+            </label>
+          </div>
+         
+        </div>
+       
+        <div class="add-comment"><button class="btn btn-outline-secondary btn-sm" value="off">Add Comment</button></div>
+      </div>
+      <div id="left-sidebar">
+        <div class="top"></div>
+        <div class="sel-anno-wrap"></div>
+        <div class="anno-wrap"></div></div>
+      <div id="main">
+       
+        <div id="video-wrap">
+          <div id="video-controls">
+            <div class="play-pause play">
+              <i class="far fa-play-circle fa-2x"></i>
+            </div>
+            <div class="time">
+              <time id="time-elapsed">00:00</time>
+              <span> / </span>
+              <time id="duration">00:00</time>
+            </div>
+       
+              <div class="progress-bar">
+                <div class="progress-bar-fill"></div>
+              </div>
+          </div>
+          <video controls class="video" id="video" preload="metadata">
+            <source src="{{url_for('static', filename='assets/entryComp_ver2_credit_110920.mp4')}}" type="video/mp4">
+          </video>
+          <canvas  id="canvas"></canvas>
+          <div id="interaction"></div>
+        </div>
+        <div class="timeline-wrap">
+          <div id="timeline-tooltip"></div>
+        </div>
+      </div>
+      <div id="right-sidebar">
+        <div id="comment-wrap">
+          <div class="top"></div>
+          <div class="selected-comm-wrap"></div>
+          <div class="general-comm-wrap"></div>
+        </div>
+      </div>
+    </div>
+
+
+    <script src="{{url_for('static', filename='bundle.js')}}"></script>
   </body>
 </html>
-

@@ -6,6 +6,29 @@ import { fbConfig } from '.';
 import { updateCommentSidebar } from './annotationDashboard/commentBar';
 import { renderTimeline } from './annotationDashboard/timeline';
 
+export const userLoggedIn = {
+  loggedInBool : false,
+  uid : null,
+  displayName : null,
+  admin : false,
+  email : null
+}
+
+export function addUser(user){
+  if(user != null){
+    userLoggedIn.uid = user.uid;
+    userLoggedIn.displayName = user.displayName;
+    userLoggedIn.email = user.email;
+    userLoggedIn.loggedInBool = true;
+    userLoggedIn.admin = false;
+  }else{
+    userLoggedIn.uid = null;
+    userLoggedIn.displayName = null;
+    userLoggedIn.email = null;
+    userLoggedIn.loggedInBool = false;
+    userLoggedIn.admin = false;
+  }
+}
 
 export async function checkUser(callbackArray){
 
@@ -16,6 +39,7 @@ export async function checkUser(callbackArray){
   firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
       currentUser.push(user);
+      console.log('userrrr', user)
       callbackArray.forEach(fun=> {
         fun(user);
       });
@@ -23,6 +47,7 @@ export async function checkUser(callbackArray){
           // User is signed in.
     } else {
       console.log("NO USER", user);
+      checkDatabase([updateCommentSidebar, renderTimeline])
           // No user is signed in.
     }
     

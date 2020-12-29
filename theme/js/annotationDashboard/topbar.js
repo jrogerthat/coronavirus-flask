@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { clearBoard, clearRightSidebar, formatCommenting, renderCommentDisplayStructure, renderStructureKnowns, updateCommentSidebar  } from './commentBar';
 require("regenerator-runtime/runtime");
 import firebase from 'firebase/app';
-import { checkDatabase } from '../firebaseUtil';
+import { checkDatabase, userLoggedIn } from '../firebaseUtil';
 import { dataKeeper } from '../dataManager';
 import { clearCanvas, structureSelected, structureSelectedToggle } from './imageDataUtil';
 import { updateAnnotationSidebar } from './annotationBar';
@@ -81,11 +81,19 @@ export function goBackButton(){
 export function addCommentButton(){
     let button = d3.select('#top-bar').select('.add-comment').select('button');
     button.text('Add Comment');
-    button.on('click', (event)=>{
-        clearRightSidebar();
-        d3.select('#interaction').style('pointer-events', 'all');
-        let wrap = d3.select('#right-sidebar').select('#comment-wrap');
-        formatCommenting(wrap, []);
-        goBackButton();
-    });
+    console.log('in add comment', userLoggedIn)
+    if(userLoggedIn.loggedInBool === false){
+        button.text('Log in to comment');
+        
+    }else{
+        button.text('Add Comment');
+        button.on('click', (event)=>{
+            clearRightSidebar();
+            d3.select('#interaction').style('pointer-events', 'all');
+            let wrap = d3.select('#right-sidebar').select('#comment-wrap');
+            formatCommenting(wrap, []);
+            goBackButton();
+        });
+    }
+   
 }

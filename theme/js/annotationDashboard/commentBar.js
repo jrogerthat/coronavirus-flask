@@ -1,11 +1,13 @@
 import * as d3 from 'd3';
 import { currentUser, dataKeeper, formatVideoTime } from '../dataManager';
 import firebase from 'firebase/app';
-import { checkDatabase } from '../firebaseUtil';
+import { checkDatabase, userLoggedIn } from '../firebaseUtil';
 import { colorDictionary, structureSelected, doodleKeeper } from './imageDataUtil';
 import { commentClicked } from './video';
 require('firebase/auth');
 require('firebase/database');
+
+
 
 export function clearRightSidebar(){
     d3.select('#comment-wrap').selectAll('*').remove();
@@ -13,6 +15,7 @@ export function clearRightSidebar(){
 
 export function updateCommentSidebar(dbRef){
 
+    console.log('updateCommentSidebar', userLoggedIn);
     let wrap = d3.select('#right-sidebar').select('#comment-wrap').select(".general-comm-wrap");
 
     let nestReplies = formatCommentData(dbRef);
@@ -46,7 +49,6 @@ function replyInputBox(d, i, n, user){
     let inputDiv = d3.select(n.parentNode).append('div').classed('text-input-sidebar', true);
     inputDiv.append('text').text(`${user.displayName}:`)
     inputDiv.append('textarea').attr('id', 'text-area-id').attr('placeholder', 'Comment Here');
-   // let tagButton = dropDown(inputDiv, tagOptions, 'Tag', 'tag-drop');
     let submit = inputDiv.append('button').text('Add').classed('btn btn-secondary', true);
 
     submit.on('click', (event)=> {
@@ -117,7 +119,31 @@ function updateTags(node, tagWrap, tagArray){
     node.value = "";
 }
 
-export function drawCommentBoxes(nestedData, wrap, selectedData){
+function upvoteIcon(div, db){
+    //UPVOTE
+    let upVote = div.selectAll('.upvote-span').data(d=> [d]).join('span').classed('upvote-span', true);
+    upVote.selectAll('.upvote').data(d=> [d]).join('i').classed('upvote fas fa-thumbs-up fa-sm', true);
+    upVote.selectAll('.up-text').data(d=> [d]).join('text').classed('up-text', true).text(d=> `: ${d.upvote} `);
+
+    upVote.on('click', (event, d)=> {
+        let newUp = ++d.upvote;
+        db.ref(`comments/${d.key}/upvote`).set(`${newUp}`);
+    });
+}
+
+function downvoteIcon(div, db){
+    //DOWNVOTE
+    let downvote = div.selectAll('.downvote-span').data(d=> [d]).join('span').classed('downvote-span', true);
+    downvote.selectAll('.downvote').data(d=> [d]).join('i').classed('downvote fas fa-thumbs-down fa-sm', true);
+    downvote.selectAll('.down-text').data(d=> [d]).join('text').classed('down-text', true).text(d=> `: ${d.downvote}`);
+
+    downvote.on('click', (event, d)=> {
+        let newDown = ++d.downvote;
+        db.ref(`comments/${d.key}/downvote`).set(`${newDown}`);
+    });
+}
+
+export function drawCommentBoxes(nestedData, wrap){
    
     let memoDivs = wrap.selectAll('.memo').data(nestedData).join('div').classed('memo', true);
     memoDivs.selectAll('.name').data(d=> [d]).join('span').classed('name', true).selectAll('text').data(d=> [d]).join('text').text(d=> `${d.displayName}:`);
@@ -150,70 +176,59 @@ export function drawCommentBoxes(nestedData, wrap, selectedData){
     memoDivs.style('border', d=> {
         return `1px solid gray`});
 
-//UPVOTE
-    let upVote = memoDivs.selectAll('.upvote-span').data(d=> [d]).join('span').classed('upvote-span', true);
-    upVote.selectAll('.upvote').data(d=> [d]).join('i').classed('upvote fas fa-thumbs-up fa-sm', true);
-    upVote.selectAll('.up-text').data(d=> [d]).join('text').classed('up-text', true).text(d=> `: ${d.upvote} `);
+    upvoteIcon(memoDivs, db);
 
-    upVote.on('click', (event, d)=> {
-        let newUp = ++d.upvote;
-        db.ref(`comments/${d.key}/upvote`).set(`${newUp}`);
-    });
+    downvoteIcon(memoDivs, db);
 
-//DOWNVOTE
-    let downvote = memoDivs.selectAll('.downvote-span').data(d=> [d]).join('span').classed('downvote-span', true);
-    downvote.selectAll('.downvote').data(d=> [d]).join('i').classed('downvote fas fa-thumbs-down fa-sm', true);
-    downvote.selectAll('.down-text').data(d=> [d]).join('text').classed('down-text', true).text(d=> `: ${d.downvote}`);
+    if(userLoggedIn.loggedInBool){
 
-    downvote.on('click', (event, d)=> {
-        let newDown = ++d.downvote;
-        db.ref(`comments/${d.key}/downvote`).set(`${newDown}`);
-    });
+        //RESOLVE
+        let resolve = memoDivs.filter(f=> {
+            return f.uid === currentUser[currentUser.length - 1].uid
+        }).selectAll('.resolve-span').data(d=> [d]).join('span').classed('resolve-span', true).text("Resolve ")
+        resolve.selectAll('.resolve').data(d=> [d]).join('i').classed('resolve', true).classed('resolve fas fa-check', true);//.text(d=> `${d.displayName}:`);
+        resolve.on('click', (d)=> {
+            db.ref(`comments/${d.key}/resolved`).set(`true`);
+        });
+        //REPLY
+        let reply = memoDivs.selectAll('.reply-span').data(d=> [d]).join('span').classed('reply-span', true).text('Reply ');
+        reply.selectAll('.reply').data(d=> [d]).join('i').classed('far fa-comment-dots fa-lg reply', true)//.style('float', 'right')//.text('Reply');
 
-//RESOLVE
-    let resolve = memoDivs.filter(f=> {
-        return f.uid === currentUser[currentUser.length - 1].uid
-    }).selectAll('.resolve-span').data(d=> [d]).join('span').classed('resolve-span', true).text("Resolve ")
-    resolve.selectAll('.resolve').data(d=> [d]).join('i').classed('resolve', true).classed('resolve fas fa-check', true);//.text(d=> `${d.displayName}:`);
-    resolve.on('click', (d)=> {
-        db.ref(`comments/${d.key}/resolved`).set(`true`);
-    });
-//REPLY
-    let reply = memoDivs.selectAll('.reply-span').data(d=> [d]).join('span').classed('reply-span', true).text('Reply ');
-    reply.selectAll('.reply').data(d=> [d]).join('i').classed('far fa-comment-dots fa-lg reply', true)//.style('float', 'right')//.text('Reply');
+        reply.on("click", function(event, d) {
 
-    reply.on("click", function(event, d) {
+            event.stopPropagation();
+            let e =  reply.nodes();
+            let i = e.indexOf(this);
 
-        event.stopPropagation();
-        let e =  reply.nodes();
-        let i = e.indexOf(this);
+            if(d.replyBool === false){
 
-        if(d.replyBool === false){
+                d.replyBool = true;
 
-            d.replyBool = true;
+                replyInputBox(d, i, event.target, user);
 
-            firebase.auth().onAuthStateChanged(function(user) {
-                if (user) {
-                 
-                    replyInputBox(d, i, event.target, user);
-                   
-                    // User is signed in.
-                } else {
-                    console.log("NO USER", user);
-                    // No user is signed in.
-                }
-            });   
+                // firebase.auth().onAuthStateChanged(function(user) {
+                //     if (user) {
+                    
+                //         replyInputBox(d, i, event.target, user);
+                    
+                //         // User is signed in.
+                //     } else {
+                //         console.log("NO USER", user);
+                //         // No user is signed in.
+                //     }
+                // });   
 
-        }else{
-            d.replyBool = false;
-            d3.select(event.target.parentNode).select('.text-input-sidebar').remove();
-        }
-      });
+            }else{
+                d.replyBool = false;
+                d3.select(event.target.parentNode).select('.text-input-sidebar').remove();
+            }
+        });
+    }
 
       var db = firebase.database();
 
       memoDivs.on('click', (event, d)=>{
-          console.log('event', event.target.tagName);
+          
           if(event.target.tagName.toLowerCase() === 'textarea' || 
           event.target.tagName.toLowerCase() === 'button' || 
           event.target.tagName.toLowerCase() === 'a' || 
@@ -602,7 +617,6 @@ export function formatPush(){
 
     interactionDiv.on("click", function(event) {
 
-
         event.stopPropagation();
         let coords = d3.pointer(this);
 
@@ -781,62 +795,56 @@ export function formatTimeControl(div){
 }
 
 function replyRender(replyDivs){
+    const db = firebase.database();
           
     replyDivs.selectAll('.name').data(d=> [d]).join('span').classed('name', true).selectAll('text').data(d=> [d]).join('text').text(d=> `${d.displayName} replied:`);
-
-    // let tags = replyDivs.selectAll('.tag-span').data(d=> [d]).join('span').classed('tag-span', true);
-    // tags.selectAll('.badge').data(d=> [d]).join('span').classed('badge badge-secondary', true).style('background-color', d=> tagOptions.filter(f=> f.key === d.tags)[0].color).text(d=> d.tags);
-   
     replyDivs.selectAll('.comment').data(d=> [d]).join('span').classed('comment', true).selectAll('text').data(d=> [d]).join('text').text(d=> d.comment);
     replyDivs.selectAll('.post-time').data(d=> [d]).join('span').classed('post-time', true)
     .selectAll('text').data(d=> [d]).join('text').text(d=> {
         let test = new Date(d.postTime);
         return `on ${test.toUTCString()}`});
 
-    let upvote = replyDivs.selectAll('.upvote-span').data(d=> [d]).join('span').classed('upvote-span', true);
-    upvote.selectAll('.upvote').data(d=> [d]).join('i').classed('upvote fas fa-thumbs-up fa-sm', true);
-    upvote.selectAll('.up-text').data(d=> [d]).join('text').classed('up-text', true).text(d=> `: ${d.upvote} `);
+    upvoteIcon(replyDivs, db);
+    downvoteIcon(replyDivs, db);
 
-    let downvote = replyDivs.selectAll('.downvote-span').data(d=> [d]).join('span').classed('downvote-span', true);
-    downvote.selectAll('.downvote').data(d=> [d]).join('i').classed('downvote fas fa-thumbs-down', true);
-    downvote.selectAll('.down-text').data(d=> [d]).join('text').classed('down-text', true).text(d=> `: ${d.downvote}`);
+    if(userLoggedIn.loggedInBool){
+        let reply = replyDivs.selectAll('.reply-span').data(d=> [d]).join('span').classed('reply-span', true).text("Reply ");
+        reply.selectAll('.reply').data(d=> [d]).join('i').classed('far fa-comment-dots reply', true).style('float', 'right');
 
-    let reply = replyDivs.selectAll('.reply-span').data(d=> [d]).join('span').classed('reply-span', true).text("Reply ");
-    reply.selectAll('.reply').data(d=> [d]).join('i').classed('far fa-comment-dots reply', true).style('float', 'right');
+        let resolve = replyDivs.selectAll('.resolve-span').data(d=> [d]).join('span').classed('resolve-span', true).text("Resolve ")
+        resolve.selectAll('.resolve').data(d=> [d]).join('i').classed('resolve', true).classed('resolve fas fa-check', true);//.text(d=> `${d.displayName}:`);
 
-    let resolve = replyDivs.selectAll('.resolve-span').data(d=> [d]).join('span').classed('resolve-span', true).text("Resolve ")
-    resolve.selectAll('.resolve').data(d=> [d]).join('i').classed('resolve', true).classed('resolve fas fa-check', true);//.text(d=> `${d.displayName}:`);
+        resolve.on('click', (event, d)=> {
+            db.ref(`comments/${d.key}/resolved`).set(`true`);
+        });
 
-    resolve.on('click', (event, d)=> {
-        db.ref(`comments/${d.key}/resolved`).set(`true`);
-    });
+        reply.on("click", function(event, d) {
 
+            event.stopPropagation();
 
-    reply.on("click", function(event, d) {
+            let e = reply.nodes();
+            let i = e.indexOf(this);
 
-        event.stopPropagation();
+            if(!d.replyBool){
 
-        let e = reply.nodes();
-        let i = e.indexOf(this);
+                d.replyBool = true;
+                replyInputBox(d, i, event.target, user);
 
-        if(d.replyBool === false){
-
-            d.replyBool = true;
-
-            firebase.auth().onAuthStateChanged(function(user) {
-                if (user) {
-                    replyInputBox(d, i, event.target, user);
-                } else {
-                    console.log("NO USER", user);
-                    // No user is signed in.
-                }
-            });   
+                // firebase.auth().onAuthStateChanged(function(user) {
+                //     if (user) {
+                //         replyInputBox(d, i, event.target, user);
+                //     } else {
+                //         console.log("NO USER", user);
+                //         // No user is signed in.
+                //     }
+                // });   
 
         }else{
             d.replyBool = false;
             d3.select(event.target.parentNode).select('.text-input-sidebar').remove();
         }
-      });
+        });
+    }
 }
 
 export function renderNav(div, nav){
