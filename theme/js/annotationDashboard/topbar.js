@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { clearBoard, clearRightSidebar, formatCommenting, renderCommentDisplayStructure, renderStructureKnowns, updateCommentSidebar  } from './commentBar';
 require("regenerator-runtime/runtime");
 import firebase from 'firebase/app';
-import { checkDatabase, userLoggedIn } from '../firebaseUtil';
+import { addUser, checkDatabase, userLoggedIn, userLogin } from '../firebaseUtil';
 import { dataKeeper } from '../dataManager';
 import { clearCanvas, structureSelected, structureSelectedToggle } from './imageDataUtil';
 import { updateAnnotationSidebar } from './annotationBar';
@@ -48,7 +48,7 @@ export function renderUser(userData){
     let displayName = userData.displayName != null ? userData.displayName : userData.isAnonymous == false ? userData.email : "Guest";
     let div = d3.select('#top-bar').select('#user');
     div.selectAll('text.user_name').data([displayName]).join('text').classed('user_name', true).text(displayName);
-    renderIssueButton(div);
+    // renderIssueButton(div);
 }
 
 export function addStructureLabelFromButton(structure){
@@ -78,13 +78,20 @@ export function goBackButton(){
     });
 }
 
+
+
 export function addCommentButton(){
     let button = d3.select('#top-bar').select('.add-comment').select('button');
-    button.text('Add Comment');
-    console.log('in add comment', userLoggedIn)
+    console.log('userrrr', userLoggedIn)
+
     if(userLoggedIn.loggedInBool === false){
         button.text('Log in to comment');
-        
+        button.on('click', (event)=>{
+            clearRightSidebar();
+            d3.select('#right-sidebar').select('#comment-wrap').append('div').attr("id", "sign-in-container");
+            userLogin();
+        });
+
     }else{
         button.text('Add Comment');
         button.on('click', (event)=>{

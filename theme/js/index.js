@@ -1,5 +1,6 @@
 import firebase from 'firebase/app';
-const { renderUser, addCommentButton, toggleSort } = require("./annotationDashboard/topbar");
+
+const { renderUser, addCommentButton, toggleSort, renderIssueButton } = require("./annotationDashboard/topbar");
 const { dataKeeper, currentUser, formatAnnotationTime } = require("./dataManager");
 const { checkUser, pullDataFromDatabase } = require("./firebaseUtil");
 import "core-js/stable";
@@ -35,7 +36,8 @@ async function init(){
 
     if (!firebase.apps.length) { firebase.initializeApp(fbConfig[0]);}
 
-    checkUser([renderUser]);
+    checkUser([renderUser, addCommentButton]);
+    renderIssueButton(d3.select('#top-bar').select('#user'));
     updateAnnotationSidebar(anno, null, null);
     formatVidPlayer(true);
     videoUpdates();
@@ -52,7 +54,7 @@ async function init(){
         .style("border-radius", "5px")
         .style("padding", "5px");
 
-    addCommentButton();
+    //addCommentButton();
     d3.select('#sort-by').select('input').on('click', (event)=> toggleSort(event));
 
 }

@@ -17,6 +17,8 @@ export function updateCommentSidebar(dbRef){
 
     console.log('updateCommentSidebar', userLoggedIn);
     let wrap = d3.select('#right-sidebar').select('#comment-wrap').select(".general-comm-wrap");
+    clearRightSidebar();
+    renderCommentDisplayStructure();
 
     let nestReplies = formatCommentData(dbRef);
 
@@ -144,6 +146,8 @@ function downvoteIcon(div, db){
 }
 
 export function drawCommentBoxes(nestedData, wrap){
+
+    console.log('is this reaching', wrap)
    
     let memoDivs = wrap.selectAll('.memo').data(nestedData).join('div').classed('memo', true);
     memoDivs.selectAll('.name').data(d=> [d]).join('span').classed('name', true).selectAll('text').data(d=> [d]).join('text').text(d=> `${d.displayName}:`);
@@ -458,8 +462,6 @@ export function doodleSubmit(commentType, user, tags, currentTime){
                     
         refCom.push(dataPush);
         
-        clearRightSidebar();
-        renderCommentDisplayStructure();
         checkDatabase([updateCommentSidebar]);
     });
 }
@@ -743,8 +745,6 @@ export function formatCommenting(div, startingTags){
                 let dataPush = formatComment2Send(user, currentTime, 'push', tags.data().toString(), coords, null, null);
                 let refCom = firebase.database().ref(commentType);                     
                 refCom.push(dataPush);
-                clearRightSidebar();
-                renderCommentDisplayStructure();
                 checkDatabase([updateCommentSidebar]);
                 d3.select('#add-mark').remove();
                 
@@ -763,8 +763,6 @@ export function formatCommenting(div, startingTags){
                 let dataPush = formatComment2Send(user, currentTime, 'none', tags.data().toString(), coords, null, null);
                 let refCom = firebase.database().ref(commentType);                     
                 refCom.push(dataPush);
-                clearRightSidebar();
-                renderCommentDisplayStructure();
                 checkDatabase([updateCommentSidebar]);
                 d3.select('#add-mark').remove();
                
