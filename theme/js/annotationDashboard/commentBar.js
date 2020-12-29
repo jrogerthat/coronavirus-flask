@@ -3,6 +3,7 @@ import { currentUser, dataKeeper, formatVideoTime } from '../dataManager';
 import firebase from 'firebase/app';
 import { checkDatabase } from '../firebaseUtil';
 import { colorDictionary, structureSelected, doodleKeeper } from './imageDataUtil';
+import { commentClicked } from './video';
 require('firebase/auth');
 require('firebase/database');
 
@@ -212,12 +213,14 @@ export function drawCommentBoxes(nestedData, wrap, selectedData){
       var db = firebase.database();
 
       memoDivs.on('click', (event, d)=>{
+          console.log('event', event.target.tagName);
           if(event.target.tagName.toLowerCase() === 'textarea' || 
           event.target.tagName.toLowerCase() === 'button' || 
           event.target.tagName.toLowerCase() === 'a' || 
           event.target.tagName.toLowerCase() === 'svg'){
+              console.log('not clicked right');
           }else{ 
-              skipAheadCircle(d.videoTime);
+            commentClicked(event, d);
           }     
       });
   

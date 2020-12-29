@@ -91,6 +91,11 @@ function progressClicked(mouse){
   document.getElementById('video').currentTime = Math.round(scaleVideoTime(mouse.offsetX, true));
   updateTimeElapsed();
 }
+
+export function commentClicked(event, d){
+  document.getElementById('video').currentTime = d.videoTime;
+  updateTimeElapsed();
+}
 function scaleVideoTime(currentTime, invert){
   let duration = document.getElementById('video').duration;
   let scale = d3.scaleLinear().range([0, video.videoWidth]).domain([0, duration]);
