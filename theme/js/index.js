@@ -13,7 +13,6 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 import { fab } from '@fortawesome/free-brands-svg-icons'
-import { renderTimeline } from './annotationDashboard/timeline';
 
 library.add(faCheck, fas, far, fab) 
 dom.i2svg() 
