@@ -359,7 +359,7 @@ export async function videoUpdates(data, annoType){
       let pushedG = svg.selectAll('g.pushed').data(pushes).join('g').classed('pushed', true);
       pushedG.attr('transform', (d)=> `translate(${(960 * d.posLeft)}, ${(540 * d.posTop)})`);
 
-      console.log('pushes',pushes);
+      console.log('pushes', pushes);
         
       let circ = pushedG.selectAll('circle').data(d=> [d]).join('circle')
       circ.attr('r', 10);
@@ -373,39 +373,33 @@ export async function videoUpdates(data, annoType){
       circ.attr('fill', 'red');
 
       circ.on('mouseover', (d)=>{
-
           let wrap = d3.select('#right-sidebar').select('#comment-wrap');
           let memoDivs = wrap.selectAll('.memo').filter(f=> f.key === d.key);
           memoDivs.classed('selected', true);
           memoDivs.nodes()[0].scrollIntoView({behavior: "smooth"});
 
       }).on('mouseout', (d)=> {
-
           let wrap = d3.select('#right-sidebar').select('#annotation-wrap');
           let memoDivs = wrap.selectAll('.memo').classed('selected', false);
       });
 
-      let annotationGroup = svg.selectAll('g.annotations').data(commentsInTimeframe).join('g').classed('annotations', true);
-      let annotationMark = annotationGroup.filter(f=> f.commentMark === 'push').selectAll('circle').data(d=> [d]).join('circle').attr('r', 5).attr('cx', d=> d.posLeft).attr('cy',d=>  d.posTop);
+
+      let annotationGroup = pushedG.selectAll('g.annotations').data(d=> [d]).join('g').classed('annotations', true);
+      // let annotationMark = annotationGroup.filter(f=> f.commentMark === 'push').selectAll('circle').data(d=> [d]).join('circle').attr('r', 5).attr('cx', d=> d.posLeft).attr('cy',d=>  d.posTop);
+      let labelRect = annotationGroup.selectAll('rect').data(d=> [d]).join('rect')
+        .attr('x', 17)
+        .attr('y', -20)
+        .attr('width', 100)
+        .attr('height', 30)
+        .attr('fill', '#fff');
+
       let annotationText = annotationGroup.selectAll('text').data(d=> [d]).join('text')
-      .text(d=> d.comment)
+      .text(d=> d.displayName)
       .classed('annotation-label', true)
-      .attr('x', d=> {
-        return 0;
-          // if(d.commentMark === 'push'){
-          //     let noPx = parseInt(d.posLeft.replace(/px/,""));
-          //     return noPx+10+"px";
-          // }else{
-          //      return '50px'
-          // }
-      })
-       .attr('y',d=>  {
-           if(d.commentMark === 'push'){
-              return d.posTop;
-           }else{
-               return '50px'
-           }
-      });    
+      .attr('x', d=> 22)
+      .attr('y', d=> 0);   
+
+ 
     }
   };
  }
