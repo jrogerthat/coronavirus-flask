@@ -25,8 +25,6 @@ function recurse(parent, replyArray, level){
     parent.level = level;
     parent.replyBool = false;
 
- 
-   
     let replies = replyArray.filter(f=> {
         
         return f.replies.toString() === parent.key});
@@ -214,12 +212,10 @@ export function drawCommentBoxes(nestedData, wrap, selectedData){
       var db = firebase.database();
 
       memoDivs.on('click', (event, d)=>{
-        
           if(event.target.tagName.toLowerCase() === 'textarea' || 
           event.target.tagName.toLowerCase() === 'button' || 
           event.target.tagName.toLowerCase() === 'a' || 
           event.target.tagName.toLowerCase() === 'svg'){
-          
           }else{ 
               skipAheadCircle(d.videoTime);
           }     

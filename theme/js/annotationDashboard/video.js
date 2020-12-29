@@ -13,6 +13,7 @@ let canPlay;
 
 const currentColorCodes = [];
 
+
 const canvas = document.getElementById('canvas');
 canvas.setAttribute('pointer-events', 'none');
 
@@ -280,10 +281,68 @@ function structureTooltip(structureData, coord, snip, hoverBool){
     
 
 }
-export async function videoUpdates(data, annoType){
 
+function renderPushpinMarks(commentsInTimeframe, svg){
+
+  let pushes = commentsInTimeframe.filter(f => f.commentMark === "push")
+  let pushedG = svg.selectAll('g.pushed').data(pushes).join('g').classed('pushed', true);
+  pushedG.attr('transform', (d)=> `translate(${(960 * d.posLeft)}, ${(540 * d.posTop)})`);
+    
+  let circ = pushedG.selectAll('circle').data(d=> [d]).join('circle')
+  circ.attr('r', 10);
+  
+  circ.attr('cx', d=> {
+    return 0
+  });
+  circ.attr('cy', d=> {
+    return  0;
+  });
+  circ.attr('fill', 'red');
+
+  circ.on('mouseover', (d)=>{
+      let wrap = d3.select('#right-sidebar').select('#comment-wrap');
+      let memoDivs = wrap.selectAll('.memo').filter(f=> f.key === d.key);
+      memoDivs.classed('selected', true);
+      memoDivs.nodes()[0].scrollIntoView({behavior: "smooth"});
+
+  }).on('mouseout', (d)=> {
+      let wrap = d3.select('#right-sidebar').select('#annotation-wrap');
+      let memoDivs = wrap.selectAll('.memo').classed('selected', false);
+  });
+
+  let annotationGroup = pushedG.selectAll('g.annotations').data(d=> [d]).join('g').classed('annotations', true);
+
+  let labelRect = annotationGroup.selectAll('rect').data(d=> [d]).join('rect')
+    .attr('x', 17)
+    .attr('y', -20)
+    .attr('width', 100)
+    .attr('height', 30)
+    .attr('fill', '#fff');
+
+  let annotationText = annotationGroup.selectAll('text').data(d=> [d]).join('text')
+  .text(d=> d.displayName)
+  .classed('annotation-label', true)
+  .attr('x', d=> 22)
+  .attr('y', d=> 0);   
+
+}
+async function renderDoodles(commentsInTimeframe, div){
   const storageRef = firebase.storage().ref();
+
   let doods = await storageRef.child('images/').listAll();
+
+  let doodles = commentsInTimeframe.filter(f => f.commentMark === "doodle");
+
+  let doodFromStorage = doodles.map(async (dood)=> {
+    let urlDood = await doods.items.filter(f=>f._delegate._location.path_ === `images/${dood.doodleName}`)[0].getDownloadURL();
+    return urlDood;
+  });
+
+  let images = div.selectAll('.doodles').data(await Promise.all(doodFromStorage)).join('img').classed('doodles', true);
+  images.attr('src', d=> d);
+}
+
+export function videoUpdates(data, annoType){
  
   let svgTest = d3.select('#interaction').select('svg')
   let svg = svgTest.empty() ? d3.select('#interaction').append('svg') : svgTest;
@@ -298,12 +357,41 @@ export async function videoUpdates(data, annoType){
       if(!event.target.checked){
           console.log('checked erase canvas');
           d3.select('#interaction').selectAll('.doodles').remove();
+      }else{
+        let commentData = Object.entries(dataKeeper[dataKeeper.length - 1].comments).map(m=> m[1]).filter(f=> f.replies === "null");
+       
+        let timeRange = [video.currentTime < 1.5 ? 0 : Math.floor(video.currentTime - 1.5), video.currentTime + 1.5];
+        let commentsInTimeframe = commentData.filter((f,i)=> {
+            let time = JSON.parse(f.videoTime);
+            if(time.length > 1){
+                return time[0] <= video.currentTime && time[1] >= video.currentTime;
+            }else{
+                return time <= timeRange[1] && time >= timeRange[0];
+            }
+        });
+        renderDoodles(commentsInTimeframe, interDIV);
       }
   });
 
   d3.select('#show-push').select('input').on('click', (event, d)=> {
     if(!event.target.checked){
-       d3.select('#interaction').selectAll('*').remove();
+       d3.select('#interaction').selectAll('.pushed').remove();
+    }else{
+      let commentData = Object.entries(dataKeeper[dataKeeper.length - 1].comments).map(m=> m[1]).filter(f=> f.replies === "null");
+      let timeRange = [video.currentTime < 1.5 ? 0 : Math.floor(video.currentTime - 1.5), video.currentTime + 1.5];
+      let commentsInTimeframe = commentData.filter((f,i)=> {
+          let time = JSON.parse(f.videoTime);
+          if(time.length > 1){
+              return time[0] <= video.currentTime && time[1] >= video.currentTime;
+          }else{
+              return time <= timeRange[1] && time >= timeRange[0];
+          }
+      });
+
+      let svgTest = d3.select('#interaction').select('svg');
+      let svg = svgTest.empty() ? d3.select('#interaction').append('svg') : svgTest;
+
+      renderPushpinMarks(commentsInTimeframe, svg);
     }
 });
 
@@ -341,65 +429,11 @@ export async function videoUpdates(data, annoType){
     });
 
     if(d3.select('#show-doodle').select('input').node().checked){
-
-      let doodles = commentsInTimeframe.filter(f => f.commentMark === "doodle");
-
-      let doodFromStorage = doodles.map(async (dood)=> {
-          let urlDood = await doods.items.filter(f=>f._delegate._location.path_ === `images/${dood.doodleName}`)[0].getDownloadURL();
-          return urlDood;
-      });
-
-      let images = interDIV.selectAll('.doodles').data(await Promise.all(doodFromStorage)).join('img').classed('doodles', true);
-      images.attr('src', d=> d);
+      renderDoodles(commentsInTimeframe, interDIV);
     }
 
     if(d3.select('#show-push').select('input').node().checked){
-      let pushes = commentsInTimeframe.filter(f => f.commentMark === "push");
-
-      let pushedG = svg.selectAll('g.pushed').data(pushes).join('g').classed('pushed', true);
-      pushedG.attr('transform', (d)=> `translate(${(960 * d.posLeft)}, ${(540 * d.posTop)})`);
-
-      console.log('pushes', pushes);
-        
-      let circ = pushedG.selectAll('circle').data(d=> [d]).join('circle')
-      circ.attr('r', 10);
-      
-      circ.attr('cx', d=> {
-        return 0
-      });
-      circ.attr('cy', d=> {
-        return  0;
-      });
-      circ.attr('fill', 'red');
-
-      circ.on('mouseover', (d)=>{
-          let wrap = d3.select('#right-sidebar').select('#comment-wrap');
-          let memoDivs = wrap.selectAll('.memo').filter(f=> f.key === d.key);
-          memoDivs.classed('selected', true);
-          memoDivs.nodes()[0].scrollIntoView({behavior: "smooth"});
-
-      }).on('mouseout', (d)=> {
-          let wrap = d3.select('#right-sidebar').select('#annotation-wrap');
-          let memoDivs = wrap.selectAll('.memo').classed('selected', false);
-      });
-
-
-      let annotationGroup = pushedG.selectAll('g.annotations').data(d=> [d]).join('g').classed('annotations', true);
-      // let annotationMark = annotationGroup.filter(f=> f.commentMark === 'push').selectAll('circle').data(d=> [d]).join('circle').attr('r', 5).attr('cx', d=> d.posLeft).attr('cy',d=>  d.posTop);
-      let labelRect = annotationGroup.selectAll('rect').data(d=> [d]).join('rect')
-        .attr('x', 17)
-        .attr('y', -20)
-        .attr('width', 100)
-        .attr('height', 30)
-        .attr('fill', '#fff');
-
-      let annotationText = annotationGroup.selectAll('text').data(d=> [d]).join('text')
-      .text(d=> d.displayName)
-      .classed('annotation-label', true)
-      .attr('x', d=> 22)
-      .attr('y', d=> 0);   
-
- 
+      renderPushpinMarks(commentsInTimeframe, svg);
     }
   };
  }
