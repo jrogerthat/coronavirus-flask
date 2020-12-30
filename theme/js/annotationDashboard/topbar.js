@@ -1,7 +1,6 @@
 import * as d3 from 'd3';
-import firebase from 'firebase/app';
 import {
-  clearBoard, clearRightSidebar, formatCommenting, renderCommentDisplayStructure, renderStructureKnowns, updateCommentSidebar,
+  clearRightSidebar, formatToComment, renderCommentDisplayStructure, renderStructureKnowns, updateCommentSidebar,
 } from './commentBar';
 import {
   addUser, checkDatabase, userLoggedIn, userLogin,
@@ -98,7 +97,7 @@ export function addCommentButton() {
       clearRightSidebar();
       d3.select('#interaction').style('pointer-events', 'all');
       const wrap = d3.select('#right-sidebar').select('#comment-wrap');
-      formatCommenting(wrap, []);
+      formatToComment(wrap, []);
       goBackButton();
     });
   }
