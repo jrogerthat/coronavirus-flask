@@ -10,12 +10,14 @@ import { far } from '@fortawesome/free-regular-svg-icons';
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import { updateAnnotationSidebar } from './annotationDashboard/annotationBar';
 import { formatVidPlayer, videoUpdates } from './annotationDashboard/video';
+import { updateCommentSidebar } from './annotationDashboard/commentBar';
+import { renderTimeline } from './annotationDashboard/timeline';
 
 const {
   renderUser, addCommentButton, toggleSort, renderIssueButton,
 } = require('./annotationDashboard/topbar');
-const { dataKeeper, currentUser, formatAnnotationTime } = require('./dataManager');
-const { checkUser, pullDataFromDatabase } = require('./firebaseUtil');
+const { formatAnnotationTime } = require('./dataManager');
+const { checkUser } = require('./firebaseUtil');
 
 library.add(faCheck, fas, far, fab);
 dom.i2svg();
@@ -37,7 +39,7 @@ async function init() {
 
   if (!firebase.apps.length) { firebase.initializeApp(fbConfig[0]); }
 
-  checkUser([renderUser]);
+  checkUser([renderUser], [addCommentButton, updateCommentSidebar, renderTimeline]);
   renderIssueButton(d3.select('#top-bar').select('#user'));
   updateAnnotationSidebar(anno, null, null);
   formatVidPlayer(true);

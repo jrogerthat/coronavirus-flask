@@ -1,9 +1,7 @@
 import firebase from 'firebase/app';
 import { currentUser, dataKeeper } from './dataManager';
 import { fbConfig } from '.';
-import { updateCommentSidebar } from './annotationDashboard/commentBar';
-import { renderTimeline } from './annotationDashboard/timeline';
-import { addCommentButton } from './annotationDashboard/topbar';
+
 
 require('firebase/auth');
 require('firebase/database');
@@ -16,6 +14,22 @@ export const userLoggedIn = {
   admin: false,
   email: null,
 };
+
+export function addUser(user) {
+  if (user != null) {
+    userLoggedIn.uid = user.uid;
+    userLoggedIn.displayName = user.displayName;
+    userLoggedIn.email = user.email;
+    userLoggedIn.loggedInBool = true;
+    userLoggedIn.admin = false;
+  } else {
+    userLoggedIn.uid = null;
+    userLoggedIn.displayName = null;
+    userLoggedIn.email = null;
+    userLoggedIn.loggedInBool = false;
+    userLoggedIn.admin = false;
+  }
+}
 
 function loginSuccess(user) {
   addUser(user);
@@ -30,12 +44,12 @@ export function userLogin() {
 
   ui.start('#sign-in-container', {
     callbacks: {
-      signInSuccessWithAuthResult(authResult, redirectUrl) {
+      signInSuccessWithAuthResult(authResult) {
         const { user } = authResult;
-        const { credential } = authResult;
-        const { isNewUser } = authResult.additionalUserInfo;
-        const { providerId } = authResult.additionalUserInfo;
-        const { operationType } = authResult;
+        // const { credential } = authResult;
+        // const { isNewUser } = authResult.additionalUserInfo;
+        // const { providerId } = authResult.additionalUserInfo;
+        // const { operationType } = authResult;
 
         // Do something with the returned AuthResult.
         // Return type determines whether we continue the redirect
@@ -50,7 +64,8 @@ export function userLogin() {
         // will reset, clearing any UI. This commonly occurs for error code
         // 'firebaseui/anonymous-upgrade-merge-conflict' when merge conflict
         // occurs. Check below for more details on this.
-        return handleUIError(error);
+        //return handleUIError(error);
+        return window.alert(error);
       },
       uiShown() {
         // The widget is rendered.
@@ -72,23 +87,9 @@ export function userLogin() {
   });
 }
 
-export function addUser(user) {
-  if (user != null) {
-    userLoggedIn.uid = user.uid;
-    userLoggedIn.displayName = user.displayName;
-    userLoggedIn.email = user.email;
-    userLoggedIn.loggedInBool = true;
-    userLoggedIn.admin = false;
-  } else {
-    userLoggedIn.uid = null;
-    userLoggedIn.displayName = null;
-    userLoggedIn.email = null;
-    userLoggedIn.loggedInBool = false;
-    userLoggedIn.admin = false;
-  }
-}
 
-export async function checkUser(callbackArray) {
+
+export async function checkUser(callbackArray, callbackArrayNoArgs) {
   if (!firebase.apps.length) {
     firebase.initializeApp(fbConfig[0]);
   }
@@ -101,13 +102,15 @@ export async function checkUser(callbackArray) {
       callbackArray.forEach((fun) => {
         fun(user);
       });
-      checkDatabase([addCommentButton, updateCommentSidebar, renderTimeline]);
+      //checkDatabase([addCommentButton, updateCommentSidebar, renderTimeline]);
+      
       // User is signed in.
     } else {
       console.log('NO USER', user);
-      checkDatabase([addCommentButton, updateCommentSidebar, renderTimeline]);
+      //checkDatabase([addCommentButton, updateCommentSidebar, renderTimeline]);
       // No user is signed in.
     }
+    checkDatabase(callbackArrayNoArgs);
   });
   return currentUser;
 }

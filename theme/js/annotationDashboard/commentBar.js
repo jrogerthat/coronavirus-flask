@@ -156,7 +156,8 @@ export function drawCommentBoxes(nestedData, wrap) {
   const typeOf = memoDivs.selectAll('i.fas').data((d) => [d]).join('i').attr('class', (d) => {
     if (d.commentMark === 'push') {
       return 'fas fa-map-pin';
-    } if (d.commentMark === 'doodle') {
+    } 
+    if (d.commentMark === 'doodle') {
       return 'fas fa-paint-brush';
     }
     return 'hidden';

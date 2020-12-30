@@ -3,7 +3,7 @@ import {
   clearRightSidebar, formatToComment, renderCommentDisplayStructure, renderStructureKnowns, updateCommentSidebar,
 } from './commentBar';
 import {
-  addUser, checkDatabase, userLoggedIn, userLogin,
+  userLoggedIn, userLogin,
 } from '../firebaseUtil';
 import { dataKeeper } from '../dataManager';
 import { clearCanvas, structureSelected, structureSelectedToggle } from './imageDataUtil';
