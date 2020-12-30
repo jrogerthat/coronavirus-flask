@@ -6,7 +6,7 @@ import { currentUser, dataKeeper } from './dataManager';
 import { fbConfig } from '.';
 import { updateCommentSidebar } from './annotationDashboard/commentBar';
 import { renderTimeline } from './annotationDashboard/timeline';
-import { addCommentButton, renderUser } from './annotationDashboard/topbar';
+import { addCommentButton } from './annotationDashboard/topbar';
 
 export const userLoggedIn = {
   loggedInBool : false,
@@ -18,10 +18,6 @@ export const userLoggedIn = {
 
 function loginSuccess(user){
   addUser(user);
-  //clearRightSidebar();
-  // d3.select('#interaction').style('pointer-events', 'all');
-  // let wrap = d3.select('#right-sidebar').select('#comment-wrap');
-  // formatCommenting(wrap, []); 
 }
 
 export function userLogin(){
@@ -90,10 +86,7 @@ export function addUser(user){
     userLoggedIn.loggedInBool = false;
     userLoggedIn.admin = false;
   }
-  
- //checkUser([renderUser]);
-  //renderIssueButton(d3.select('#top-bar').select('#user'));
-  // updateAnnotationSidebar(anno, null, null);
+
 }
 
 export async function checkUser(callbackArray){

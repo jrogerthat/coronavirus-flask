@@ -148,8 +148,9 @@ function downvoteIcon(div, db){
 export function drawCommentBoxes(nestedData, wrap){
 
     console.log('is this reaching', wrap)
+    let testWrap = wrap.empty() ? d3.select('#right-sidebar').append('div') : wrap;
    
-    let memoDivs = wrap.selectAll('.memo').data(nestedData).join('div').classed('memo', true);
+    let memoDivs = d3.select('#right-sidebar').selectAll('.memo').data(nestedData).join('div').classed('memo', true);
     memoDivs.selectAll('.name').data(d=> [d]).join('span').classed('name', true).selectAll('text').data(d=> [d]).join('text').text(d=> `${d.displayName}:`);
     memoDivs.selectAll('.time').data(d=> [d]).join('span').classed('time', true).selectAll('text').data(d=> [d]).join('text').text(d=> {
         return formatVideoTime(d.videoTime);

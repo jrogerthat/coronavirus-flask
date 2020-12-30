@@ -36,7 +36,7 @@ async function init(){
 
     if (!firebase.apps.length) { firebase.initializeApp(fbConfig[0]);}
 
-    checkUser([renderUser, addCommentButton]);
+    checkUser([renderUser]);
     renderIssueButton(d3.select('#top-bar').select('#user'));
     updateAnnotationSidebar(anno, null, null);
     formatVidPlayer(true);
@@ -54,7 +54,6 @@ async function init(){
         .style("border-radius", "5px")
         .style("padding", "5px");
 
-    //addCommentButton();
     d3.select('#sort-by').select('input').on('click', (event)=> toggleSort(event));
 
 }
