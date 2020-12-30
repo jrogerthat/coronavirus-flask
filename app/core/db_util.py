@@ -7,9 +7,7 @@ class ImageData(db.Model):
     data = db.column(db.String(6000000))
 
 
-@app.route('/<test>/<name>')
 def index(test, name):
     imagedata = ImageData(name=name, data=test)
     db.session.add(imagedata)
     db.session.commit
-    return f'{"New image data added"}'
