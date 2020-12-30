@@ -128,11 +128,11 @@ export function togglePlay() {
 }
 
 export async function mouseMoveVideo(coord, video){
-  console.log(structureSelected.selected)
+  
   if(video.playing){
-    console.log('video playing');
+   
   }else if(structureSelected.selected === true || video.currentTime >= endDrawTime){
-    console.log('what this do');
+ 
   }else{
 
     let snip = getCoordColor(coord); 
@@ -170,10 +170,9 @@ export async function mouseClickVideo(coord, video){
      
       structureSelectedToggle(null);
      
-   
       togglePlay();
       addCommentButton();
-      clearRightSidebar();
+    //  clearRightSidebar();
       renderCommentDisplayStructure();
       updateCommentSidebar(commentData);
       updateAnnotationSidebar(annotationData[annotationData.length - 1], null, null)
@@ -209,7 +208,7 @@ export async function mouseClickVideo(coord, video){
       let annoWrap = d3.select('#left-sidebar');
 
       goBackButton();
-      clearRightSidebar();
+      //clearRightSidebar();
       renderCommentDisplayStructure();
 
       let genComWrap = d3.select('#comment-wrap').select('.general-comm-wrap');
@@ -357,7 +356,7 @@ export function videoUpdates(data, annoType){
 
   d3.select('#show-doodle').select('input').on('click', (event, d)=> {
       if(!event.target.checked){
-          console.log('checked erase canvas');
+       
           d3.select('#interaction').selectAll('.doodles').remove();
       }else{
         let commentData = Object.entries(dataKeeper[dataKeeper.length - 1].comments).map(m=> m[1]).filter(f=> f.replies === "null");

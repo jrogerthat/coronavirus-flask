@@ -17,8 +17,8 @@ export function updateCommentSidebar(dbRef){
 
     console.log('updateCommentSidebar', userLoggedIn);
     let wrap = d3.select('#right-sidebar').select('#comment-wrap').select(".general-comm-wrap");
-    clearRightSidebar();
-    renderCommentDisplayStructure();
+    // clearRightSidebar();
+    // renderCommentDisplayStructure();
 
     let nestReplies = formatCommentData(dbRef);
 
@@ -150,7 +150,7 @@ export function drawCommentBoxes(nestedData, wrap){
     console.log('is this reaching', wrap)
     let testWrap = wrap.empty() ? d3.select('#right-sidebar').append('div') : wrap;
    
-    let memoDivs = d3.select('#right-sidebar').selectAll('.memo').data(nestedData).join('div').classed('memo', true);
+    let memoDivs = wrap.selectAll('.memo').data(nestedData).join('div').classed('memo', true);
     memoDivs.selectAll('.name').data(d=> [d]).join('span').classed('name', true).selectAll('text').data(d=> [d]).join('text').text(d=> `${d.displayName}:`);
     memoDivs.selectAll('.time').data(d=> [d]).join('span').classed('time', true).selectAll('text').data(d=> [d]).join('text').text(d=> {
         return formatVideoTime(d.videoTime);
@@ -297,14 +297,14 @@ export function renderStructureKnowns(topCommentWrap){
         .on('click', (event, d)=> {
           topCommentWrap.selectAll('*').remove();
           let structArray = [structureSelected.structure.toString()];
-          formatCommenting(topCommentWrap, structArray);
+          formatToComment(topCommentWrap, structArray);
         });
     }else{
         infoButton.text("Log in to comment on this")
         .on('click', (event, d)=> {
           topCommentWrap.selectAll('*').remove();
           let structArray = [structureSelected.structure.toString()];
-          formatCommenting(topCommentWrap, structArray);
+          formatToComment(topCommentWrap, structArray);
         });
     }
       
@@ -630,11 +630,7 @@ export function formatPush(){
     interactionDiv.on("click", function(event) {
 
         event.stopPropagation();
-        let coords = d3.pointer(this);
 
-        firebase.auth().onAuthStateChanged(function(user) {
-            if (user) {
-  
                 if(clickedBool === false && d3.select('.media-tabber').node().value === 't2'){
 
                     let inputDiv = d3.select('#push-div').append('div').classed('comment-initiated', true);
@@ -646,13 +642,6 @@ export function formatPush(){
                     d3.select('#push-div').select('.comment-initiated').remove();
                 }
                 clickedBool === true ? clickedBool = false : clickedBool = true;
-
-                // User is signed in.
-                } else {
-                    console.log("NO USER", user);
-                // No user is signed in.
-                }
-        });    
       });
 }
 
@@ -671,9 +660,12 @@ export function noMarkFormat(){
 export function renderCommentDisplayStructure(){
     let wrap = d3.select('#right-sidebar').select('#comment-wrap');
     wrap.select('.template-wrap').remove();
-    wrap.append('div').classed('top', true);
-    wrap.append('div').classed('selected-comm-wrap', true);
-    wrap.append('div').classed('general-comm-wrap', true);
+    let topTest = wrap.select('.top');
+    let top = topTest.empty() ? wrap.append('div').classed('top', true) : topTest;
+    let selTest = wrap.select('.selected-comm-wrap');
+    let sel = selTest.empty() ? wrap.append('div').classed('selected-comm-wrap', true) : selTest;
+    let genTest = wrap.select('.general-comm-wrap');
+    let gen = genTest.empty() ? wrap.append('div').classed('general-comm-wrap', true) : genTest;
 }
 
 export function formatComment2Send(user, currentTime, mark, tag, coords, replyTo, quote){
@@ -701,7 +693,7 @@ export function formatComment2Send(user, currentTime, mark, tag, coords, replyTo
     }
 }
 
-export function formatCommenting(div, startingTags){
+export function formatToComment(div, startingTags){
 
 
     let templateWrap = div.append('div').classed('template-wrap', true);
