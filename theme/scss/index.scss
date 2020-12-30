@@ -79,14 +79,14 @@ div{
 
 #toggle-show-wrap{
   display:inline-block;
-  width:400px;
+  width:420px;
   position:absolute;
   left:50%;
   top:10px;
 }
 
 #toggle-show-wrap div, #toggle-sort-wrap div{
-  margin-left:80px;
+  margin-left:90px;
   display: inline;
  // text-align: end;
   width:190px;
@@ -273,6 +273,18 @@ margin-top:10px;
  
  .memo .upvote-text, .memo .downvote-text{
    font-size: 11px;
+ }
+
+ svg.svg-inline--fa.fa-thumbs-up.fa-w-16.upvote.fa-sm path,
+ svg.svg-inline--fa.fa-thumbs-down.fa-w-16.downvote.fa-sm path,
+ .svg-inline--fa.fa-map-marker-alt.fa-w-12 path,
+ .svg-inline--fa.fa-paint-brush.fa-w-16 path{
+  fill:#6e6a6a !important;
+ }
+
+ .push svg.svg-inline--fa.fa-map-marker-alt.fa-w-12 path,
+ .push svg.svg-inline--fa.fa-paint-brush.fa-w-16 path{
+  fill:#d54444 !important;
  }
  
  .memo button{

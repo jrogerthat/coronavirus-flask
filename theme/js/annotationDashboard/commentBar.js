@@ -136,6 +136,7 @@ function downvoteIcon(div, db) {
 export function drawCommentBoxes(nestedData, wrap) {
   console.log('is this reaching', wrap);
   const testWrap = wrap.empty() ? d3.select('#right-sidebar').append('div') : wrap;
+  const db = firebase.database();
 
   const memoDivs = wrap.selectAll('.memo').data(nestedData).join('div').classed('memo', true);
   memoDivs.selectAll('.name').data((d) => [d]).join('span').classed('name', true)
@@ -155,7 +156,7 @@ export function drawCommentBoxes(nestedData, wrap) {
 
   const typeOf = memoDivs.selectAll('i.fas').data((d) => [d]).join('i').attr('class', (d) => {
     if (d.commentMark === 'push') {
-      return 'fas fa-map-pin';
+      return 'fas fa-map-marker-alt';
     } 
     if (d.commentMark === 'doodle') {
       return 'fas fa-paint-brush';
@@ -190,7 +191,7 @@ export function drawCommentBoxes(nestedData, wrap) {
       .classed('resolve-span', true)
       .text('Resolve ');
     resolve.selectAll('.resolve').data((d) => [d]).join('i').classed('resolve', true)
-      .classed('resolve fas fa-check', true);// .text(d=> `${d.displayName}:`);
+      .classed('resolve fas fa-check', true);
     resolve.on('click', (d) => {
       db.ref(`comments/${d.key}/resolved`).set('true');
     });
@@ -209,25 +210,12 @@ export function drawCommentBoxes(nestedData, wrap) {
 
         replyInputBox(d, i, event.target, user);
 
-        // firebase.auth().onAuthStateChanged(function(user) {
-        //     if (user) {
-
-        //         replyInputBox(d, i, event.target, user);
-
-        //         // User is signed in.
-        //     } else {
-        //         console.log("NO USER", user);
-        //         // No user is signed in.
-        //     }
-        // });
       } else {
         d.replyBool = false;
         d3.select(event.target.parentNode).select('.text-input-sidebar').remove();
       }
     });
   }
-
-  var db = firebase.database();
 
   memoDivs.on('click', (event, d) => {
     if (event.target.tagName.toLowerCase() === 'textarea'
@@ -575,7 +563,7 @@ export function formatPush() {
         pushDiv.style('top', (d) => `${coords[1] - (dims.top - 50)}px`);
         pushDiv.style('left', (d) => `${coords[0]}px`);
         const push = pushDiv.append('div').classed('push', true);
-        push.append('i').classed('fas fa-map-pin', true);
+        push.append('i').classed('fas fa-map-marker-alt fa-3x', true);
       }
     });
 
