@@ -94,8 +94,8 @@ div{
 
 #toggle-show-wrap .label, #toggle-sort-wrap .label{
   position:absolute;
-  left:65px;
-  top:10px;
+  left:55px;
+  top:6px;
   font-size:11px;
   width: 130px;
 }
@@ -691,8 +691,10 @@ toggle
 .switch {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 34px;
+  width: 50px;
+  height: 25px;
+  // width: 60px;
+  // height: 34px;
 }
 
 .switch input { 
@@ -716,10 +718,10 @@ toggle
 .slider:before {
   position: absolute;
   content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
+  height: 20px;
+  width: 20px;
+  left: 2px;
+  bottom: 2px;
   background-color: white;
   -webkit-transition: .4s;
   transition: .4s;
@@ -741,7 +743,9 @@ input:checked + .slider:before {
 
 /* Rounded sliders */
 .slider.round {
-  border-radius: 34px;
+  border-radius: 28px;
+  //border-radius: 34px;
+
 }
 
 .slider.round:before {

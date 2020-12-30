@@ -47,7 +47,7 @@ export function renderIssueButton(wrap){
 export function renderUser(userData){
     let displayName = userData.displayName != null ? userData.displayName : userData.isAnonymous == false ? userData.email : "Guest";
     let div = d3.select('#top-bar').select('#user');
-    div.selectAll('text.user_name').data([displayName]).join('text').classed('user_name', true).text(displayName);
+    div.selectAll('text.user_name').data([displayName]).join('text').classed('user_name', true).text("  "+displayName);
     // renderIssueButton(div);
 }
 
