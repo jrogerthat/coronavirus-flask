@@ -1,6 +1,5 @@
 import * as d3 from 'd3';
 import { annotationData } from '..';
-import { dataKeeper, formatAnnotationTime } from '../dataManager';
 
 function structureTooltip(coord, d, type) {
   if (type === 'comments') {
@@ -99,11 +98,16 @@ export function highlightTimelineBars(timeRange) {
 export function commentBinTimelineMouseover(event, d) {
   d3.select(event.target.parentNode).classed('current-hover', true);
   console.log('d on mouseover', d);
+  d3.select('.progress-bar').append('div');
   if (d.data.length > 0) {
     const comments = d3.select('#right-sidebar').select('#comment-wrap').selectAll('.memo');
     const filComm = comments.filter((f) => d.data.map((m) => m.key).indexOf(f.key) > -1);
     filComm.classed('selected', true);
     filComm.nodes()[0].scrollIntoView({ behavior: 'smooth' });
+
+    let measuereLeft = (event.target.getBoundingClientRect().x - (d3.pointer(event)[0] + 290))
+
+    d3.select('.progress-bar').append('div').style('position', 'absolute').style('left', `${measuereLeft}px`).style('opacity', '.9').style('background-color', '#fff').style('border', '1px dashed gray').style('border-radius', 0).style('width', '25px');
 
     structureTooltip([(event.target.getBoundingClientRect().x - 300)], d, 'comments');
   }

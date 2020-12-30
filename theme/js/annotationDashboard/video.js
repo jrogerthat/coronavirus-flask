@@ -160,7 +160,7 @@ export async function mouseClickVideo(coord, video) {
 
       togglePlay();
       addCommentButton();
-      //  clearRightSidebar();
+      clearRightSidebar();
       renderCommentDisplayStructure();
       updateCommentSidebar(commentData);
       updateAnnotationSidebar(annotationData[annotationData.length - 1], null, null);
