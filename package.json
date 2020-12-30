@@ -5,7 +5,9 @@
   "scripts": {
     "build": "node_modules/.bin/webpack --config webpack.config.js --mode=production",
     "watch": "node_modules/.bin/webpack --config webpack.config.js --mode=development -w",
-    "lint-js": "./node_modules/.bin/eslint theme/js/*"
+    "lint-js" : "eslint theme/js/*.js --ignore-pattern node_modules/",
+    "lint-help" : "eslint -h",
+    "lint-fix" : "eslint --fix theme/js/*.js --ignore-pattern node_modules/"
   },
   "repository": {
     "type": "git",

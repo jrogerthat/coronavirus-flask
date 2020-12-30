@@ -14,11 +14,5 @@ db = SQLAlchemy(app)
 from app.dashboard.views import mod as mod_dashboard  # noqa: E402
 app.register_blueprint(mod_dashboard)
 
-from app.login.views import mod as mod_login  # noqa: E402
-app.register_blueprint(mod_login)
-
-from app.logout.views import mod as mod_logout  # noqa: E402
-app.register_blueprint(mod_logout)
-
 from app.index.views import mod as mod_index  # noqa: E402
 app.register_blueprint(mod_index)

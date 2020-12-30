@@ -32,6 +32,8 @@ Clone or download this repository. Start your terminal and move into the root of
 4. Create demo user `python3 demo_data.py`
 5. Run server `python3 run.py`
 
+6. deploy `pipenv run deploy`
+
 **Frontend**
 1. Install packages `npm i`
 2. Start bundler `npm run watch`
