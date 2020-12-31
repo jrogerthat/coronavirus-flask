@@ -40,8 +40,8 @@ function recurse(parent, replyArray, level) {
 }
 
 function replyInputBox(d, i, n, user) {
-  console.log(d, i, n, user, userLoggedIn)
-  const inputDiv = d3.select(n.parentNode).append('div').classed('text-input-sidebar', true);
+  
+  const inputDiv = d3.select(n.parentNode.parentNode).select('.reply-space').append('div').classed('text-input-sidebar', true);
   inputDiv.append('text').text(`${userLoggedIn.displayName}:`);
   inputDiv.append('textarea').attr('id', 'text-area-id').attr('placeholder', 'Comment Here');
   const submit = inputDiv.append('button').text('Add').classed('btn btn-secondary', true);
@@ -135,7 +135,7 @@ function downvoteIcon(div, db) {
 }
 
 export function drawCommentBoxes(nestedData, wrap) {
-  console.log('is this reaching', wrap);
+ 
   const testWrap = wrap.empty() ? d3.select('#right-sidebar').append('div') : wrap;
   const db = firebase.database();
 
@@ -213,10 +213,12 @@ export function drawCommentBoxes(nestedData, wrap) {
 
       } else {
         d.replyBool = false;
-        d3.select(event.target.parentNode).select('.text-input-sidebar').remove();
+        d3.select(event.target.parentNode.parentNode).select('.reply-space').select('.text-input-sidebar').remove();
       }
     });
   }
+
+  memoDivs.selectAll('div.reply-space').data(d=> [d]).join('div').classed('reply-space', true);
 
   memoDivs.on('click', (event, d) => {
     if (event.target.tagName.toLowerCase() === 'textarea'
