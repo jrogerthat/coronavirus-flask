@@ -40,8 +40,9 @@ function recurse(parent, replyArray, level) {
 }
 
 function replyInputBox(d, i, n, user) {
+  console.log(d, i, n, user, userLoggedIn)
   const inputDiv = d3.select(n.parentNode).append('div').classed('text-input-sidebar', true);
-  inputDiv.append('text').text(`${user.displayName}:`);
+  inputDiv.append('text').text(`${userLoggedIn.displayName}:`);
   inputDiv.append('textarea').attr('id', 'text-area-id').attr('placeholder', 'Comment Here');
   const submit = inputDiv.append('button').text('Add').classed('btn btn-secondary', true);
 
@@ -660,21 +661,17 @@ export function formatToComment(div, startingTags) {
   const commentType = 'comments';
 
   submit.on('click', async (event) => {
+    console.log('clicked', event)
     const user = currentUser[currentUser.length - 1];
 
     const context = canvas.getContext('2d');
     const videoDim = document.getElementById('video').getBoundingClientRect();
-
-    // canvas.width = videoDim.width;
-    // canvas.height = videoDim.height;
 
     event.stopPropagation();
 
     if (d3.select('#text-area-id').node().value != '') {
       const tags = d3.select('.tag-wrap').selectAll('.badge');
       const { currentTime } = document.getElementById('video');
-
-      // d3.select('#interaction').style('pointer-events', 'all');
 
       if (form.node().value === 't2') {
         const vidWidth = +d3.select('#push-div').style('left').split('px')[0] / +d3.select('video').node().getBoundingClientRect().width;
@@ -727,12 +724,12 @@ export function formatTimeControl(div) {
 
   updatePlayButton();
 
-  // d3.select("#play-r").on('click', togglePlay);
-  // d3.select("#pause-r").on('click', togglePlay);
 }
 
 function replyRender(replyDivs) {
   const db = firebase.database();
+
+  console.log('reply',replyDivs)
 
   replyDivs.selectAll('.name').data((d) => [d]).join('span').classed('name', true)
     .selectAll('text')
@@ -781,14 +778,7 @@ function replyRender(replyDivs) {
         d.replyBool = true;
         replyInputBox(d, i, event.target, user);
 
-        // firebase.auth().onAuthStateChanged(function(user) {
-        //     if (user) {
-        //         replyInputBox(d, i, event.target, user);
-        //     } else {
-        //         console.log("NO USER", user);
-        //         // No user is signed in.
-        //     }
-        // });
+  
       } else {
         d.replyBool = false;
         d3.select(event.target.parentNode).select('.text-input-sidebar').remove();

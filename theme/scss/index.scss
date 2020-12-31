@@ -225,6 +225,7 @@ margin-top:10px;
 .memo{
   width:calc(100% - 25px);
   min-height:50px;
+  height: fit-content;
   border: 1px solid gray;
   padding:5px;
   cursor: pointer;
