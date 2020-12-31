@@ -762,6 +762,8 @@ function replyRender(replyDivs) {
   if (userLoggedIn.loggedInBool) {
     const reply = replyDivs.selectAll('.reply-span').data((d) => [d]).join('span').classed('reply-span', true)
       .text('Reply ');
+
+    replyDivs.selectAll('div.reply-space').data(d => [d]).join('div').classed('reply-space', true);
     reply.selectAll('.reply').data((d) => [d]).join('i').classed('far fa-comment-dots reply', true)
       .style('float', 'right');
 
@@ -780,6 +782,8 @@ function replyRender(replyDivs) {
       const e = reply.nodes();
       const i = e.indexOf(this);
 
+      console.log('d in reply', d);
+
       if (!d.replyBool) {
         d.replyBool = true;
         replyInputBox(d, i, event.target, user);
@@ -787,7 +791,7 @@ function replyRender(replyDivs) {
   
       } else {
         d.replyBool = false;
-        d3.select(event.target.parentNode).select('.text-input-sidebar').remove();
+        d3.select(event.target.parentNode.parentNode).select('.reply-space').select('.text-input-sidebar').remove();
       }
     });
   }
