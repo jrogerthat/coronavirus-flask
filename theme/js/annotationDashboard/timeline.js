@@ -1,13 +1,16 @@
 import * as d3 from 'd3';
 import { annotationData } from '..';
+import { formatTime } from '../dataManager';
 
 function structureTooltip(coord, d, type) {
   if (type === 'comments') {
+    let formatedTime = [formatTime(d.range[0]), formatTime(d.range[1])];
+    console.log(formatedTime)
     d3.select('#timeline-tooltip')
-      .style('position', 'absolute')
+      .style('position', 'absolute') 
       .style('opacity', 1)
       .html(`
-        <h7>${d.range[0]}-${d.range[1]} seconds</h7><br>
+        <h7 style="color:gray">${formatedTime[0].minutes}:${formatedTime[0].seconds} - ${formatedTime[1].minutes}:${formatedTime[1].seconds}</h7><br>
         <h7>${d.data.length} comments</h7>
         `)
       .style('left', `${coord[0]}px`)
@@ -97,7 +100,7 @@ export function highlightTimelineBars(timeRange) {
 
 export function commentBinTimelineMouseover(event, d) {
   d3.select(event.target.parentNode).classed('current-hover', true);
-  console.log('d on mouseover', d);
+
   d3.select('.progress-bar').append('div');
   if (d.data.length > 0) {
     const comments = d3.select('#right-sidebar').select('#comment-wrap').selectAll('.memo');
@@ -105,19 +108,28 @@ export function commentBinTimelineMouseover(event, d) {
     filComm.classed('selected', true);
     filComm.nodes()[0].scrollIntoView({ behavior: 'smooth' });
 
-    let measuereLeft = (event.target.getBoundingClientRect().x - (d3.pointer(event)[0] + 290))
+    let rectNodes = d3.selectAll('.comm-bin').select('rect').nodes();
+    let jump  = 960  / rectNodes.length;
 
-    d3.select('.progress-bar').append('div').style('position', 'absolute').style('left', `${measuereLeft}px`).style('opacity', '.9').style('background-color', '#fff').style('border', '1px dashed gray').style('border-radius', 0).style('width', '25px');
+    let measuereLeft = (jump * rectNodes.indexOf(event.target))
 
-    structureTooltip([(event.target.getBoundingClientRect().x - 300)], d, 'comments');
+    d3.select('.progress-bar').append('div').attr('id', 'progress-highlight')
+    .style('position', 'absolute')
+    .style('left', `${measuereLeft}px`).style('opacity', '.2')
+    .style('background-color', 'orange')
+    .style('border-radius', 0)
+    .style('width', `${jump}px`);
+
+    structureTooltip([measuereLeft + (jump+5)], d, 'comments');
   }
 }
 
 export function commentBinTimelineMouseout(event, d) {
+  d3.select('#progress-highlight').remove();
   d3.select(event.target.parentNode).classed('current-hover', false);
   const comments = d3.select('#right-sidebar').select('#comment-wrap').selectAll('.memo');
   comments.filter((f) => d.data.map((m) => m.key).indexOf(f.key) > -1).classed('selected', false);
-  d3.select('#timeline-tooltip').style('opacity', 0);
+  d3.select('#timeline-tooltip').style('opacity', 0).style('left', 0).style('top', '-200px');
 }
 
 export function timelineMouseover(event, d) {
@@ -125,7 +137,7 @@ export function timelineMouseover(event, d) {
   const filAnn = d3.select('#left-sidebar').selectAll('.anno').filter((f) => f.index === d.index).classed('selected', true);
   filAnn.nodes()[0].scrollIntoView({ behavior: 'smooth' });
   const coord = d3.pointer(event);
-  console.log('d i anno', d);
+  
   structureTooltip([(event.target.getBoundingClientRect().x - 300) + coord[0], coord[1]], d, 'anno');
 }
 
