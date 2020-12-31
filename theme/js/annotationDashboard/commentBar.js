@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { select } from 'd3';
 import firebase from 'firebase/app';
 import { currentUser, dataKeeper, formatVideoTime } from '../dataManager';
 import { checkDatabase, userLoggedIn } from '../firebaseUtil';
@@ -48,8 +49,10 @@ function replyInputBox(d, i, n, user) {
 
   submit.on('click', (event) => {
     event.stopPropagation();// user, currentTime, mark, tag, coords, replyTo, quote
-    const dataPush = formatComment2Send(user, d3.select('video').node().currentTime, 'none', 'none', null, d.key, null);
+    console.log(userLoggedIn)
+    const dataPush = formatComment2Send(userLoggedIn, d3.select('video').node().currentTime, 'none', 'none', null, d.key, null);
     const ref = firebase.database().ref('comments');
+    d3.select(n.parentNode.parentNode).select('.reply-space').select('.text-input-sidebar').remove();
     ref.push(dataPush);
   });
 }
@@ -624,6 +627,7 @@ export function renderCommentDisplayStructure() {
 }
 
 export function formatComment2Send(user, currentTime, mark, tag, coords, replyTo, quote) {
+  console.log('user', user);
   return {
     uid: user.uid,
     displayName: user.displayName,
