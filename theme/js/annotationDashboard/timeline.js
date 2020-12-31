@@ -2,6 +2,8 @@ import * as d3 from 'd3';
 import { annotationData } from '..';
 import { formatTime } from '../dataManager';
 
+const xScale = d3.scaleLinear().domain([0, 89]).range([0, 950]);
+
 function structureTooltip(coord, d, type) {
   if (type === 'comments') {
     let formatedTime = [formatTime(d.range[0]), formatTime(d.range[1])];
@@ -27,7 +29,7 @@ function structureTooltip(coord, d, type) {
   }
 }
 export function renderTimeline(commentData) {
-  const xScale = d3.scaleLinear().range([0, 950]).domain([0, 89]);
+ 
   const div = d3.select('#main');
 
   const timelineWrap = div.select('.timeline-wrap');
@@ -133,15 +135,29 @@ export function commentBinTimelineMouseout(event, d) {
 }
 
 export function timelineMouseover(event, d) {
+  let hoverRectWidth  =  xScale(d.seconds[1]) - xScale(d.seconds[0]);
+
+  d3.select('.progress-bar').append('div').attr('id', 'progress-highlight')
+  .style('position', 'absolute')
+  .style('left', `${xScale(d.seconds[0])}px`).style('opacity', '.2')
+  .style('background-color', 'orange')
+  .style('border-radius', 0)
+  .style('width', `${hoverRectWidth}px`);
+
   d3.select(event.target.parentNode).classed('current-hover', true);
-  const filAnn = d3.select('#left-sidebar').selectAll('.anno').filter((f) => f.index === d.index).classed('selected', true);
-  filAnn.nodes()[0].scrollIntoView({ behavior: 'smooth' });
-  const coord = d3.pointer(event);
   
+  const filAnn = d3.select('#left-sidebar').selectAll('.anno').filter((f) => f.index === d.index).classed('selected', true);
+  if(!filAnn.empty()){
+    filAnn.nodes()[0].scrollIntoView({ behavior: 'smooth' });
+    
+  }
+  
+  const coord = d3.pointer(event);
   structureTooltip([(event.target.getBoundingClientRect().x - 300) + coord[0], coord[1]], d, 'anno');
 }
 
 export function timelineMouseout(event, d) {
+  d3.select('#progress-highlight').remove();
   d3.select(event.target.parentNode).classed('current-hover', false);
   d3.select('#left-sidebar').selectAll('.anno').filter((f) => f.index === d.index).classed('selected', false);
   d3.select('#timeline-tooltip').style('opacity', 0);
