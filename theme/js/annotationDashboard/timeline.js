@@ -7,7 +7,7 @@ const xScale = d3.scaleLinear().domain([0, 89]).range([0, 950]);
 function structureTooltip(coord, d, type) {
   if (type === 'comments') {
     let formatedTime = [formatTime(d.range[0]), formatTime(d.range[1])];
-    console.log(formatedTime)
+    
     d3.select('#timeline-tooltip')
       .style('position', 'absolute') 
       .style('opacity', 1)
@@ -18,11 +18,20 @@ function structureTooltip(coord, d, type) {
       .style('left', `${coord[0]}px`)
       .style('top', '-60px');
   } else {
+    
+    let blurb = d.text_description.split(' ').filter((f, i)=> i < 8);
+    function addS(a, stri){
+  
+      return a + " " + stri;
+    }
+    let stringB = blurb.reduce(addS, "")
+    console.log('blurb', blurb, stringB);
     d3.select('#timeline-tooltip')
       .style('position', 'absolute')
       .style('opacity', 1)
       .html(`
-        <h7>Type: ${d.annotation_type}</h7><br>
+      <h7 style="color:gray">${d.video_time}</h7><br>
+      <h7>${stringB + "..."}</h7>
         `)
       .style('left', `${coord[0]}px`)
       .style('top', `${coord[1]}px`);
@@ -149,7 +158,6 @@ export function timelineMouseover(event, d) {
   const filAnn = d3.select('#left-sidebar').selectAll('.anno').filter((f) => f.index === d.index).classed('selected', true);
   if(!filAnn.empty()){
     filAnn.nodes()[0].scrollIntoView({ behavior: 'smooth' });
-    
   }
   
   const coord = d3.pointer(event);
