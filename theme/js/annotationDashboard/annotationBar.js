@@ -24,6 +24,65 @@ export function clearAnnotationSidebar() {
   annoWrap.select('.anno-wrap').selectAll('*').remove();
 }
 
+function renderAnnotationBoxes(divs){
+
+  divs.filter(f=> f.has_unkown === 'TRUE').classed('question', true);
+
+  const annoTime = divs.selectAll('text.time').data((d) => [d]).join('text').classed('time', true)
+    .text((d) => d.video_time);
+
+  const annoTypeHeader = divs.selectAll('h6').data((d) => [d]).join('h6');
+
+  const annoHeadSpan = annoTypeHeader.selectAll('span').data((d) => [d]).join('span').text((d) => d.annotation_type);
+  annoHeadSpan.classed('badge badge-secondary', true);
+
+  annoTypeHeader.filter((f) => f.has_unkown === 'TRUE').selectAll('i.question').data((d) => [d]).join('i')
+    .classed('fas fa-exclamation-circle question', true);
+
+
+    annoTypeHeader.filter((f) => f.ref != '' && f.ref != 'na').selectAll('i.reference').data((d) => [d]).join('i')
+    .classed('fas fa-book-open reference', true);
+ 
+  annoHeadSpan.style('background-color', (d) => 'gray');
+
+  const annoText = divs.selectAll('text.anno-text').data((d) => [d]).join('text').text((d) => d.text_description)
+    .classed('anno-text', true);
+
+  const annoRefDiv = divs.filter((f) => f.ref != '' && f.ref != 'na').selectAll('div.ref').data(d=> [d].map(m=> {
+    m.expanded = false;
+    return m;
+  })).join('div').classed('ref', true);
+
+  let refButton = annoRefDiv.selectAll('button').data(d=> [d]).join('button').classed('btn btn-outline-secondary btn-sm', true);
+  refButton.text('See Citation');
+
+  refButton.on('click', (event, d)=> {
+   
+    if(d.expanded === false){
+      d.expanded = true;
+      d3.select(event.target.parentNode).selectAll('text.ref').data((r) => [r]).join('text')
+      .classed('ref', true)
+      .text((t) => t.ref);
+      d3.select(event.target).text("Hide Citation");
+    }else{
+
+    d.expanded = false;
+    d3.selectAll('text.ref').remove();
+    d3.select(event.target).text("See Citation");
+  }
+});
+
+
+
+    const annoLink = divs.filter((f) => f.url != '' && f.url != 'na').selectAll('a.link').data((d) => [d]).join('a')
+      .classed('link', true)
+      .text((d) => d.url);
+
+    annoLink.attr('href', (d) => d.url);
+    annoLink.attr('target', '_blank');
+
+}
+
 export async function updateAnnotationSidebar(data, stackedData) {
   const annoType = annoTypes();
   /// start drawing annotation
@@ -35,57 +94,15 @@ export async function updateAnnotationSidebar(data, stackedData) {
   if (stackedData != null) {
     const structAnnoDivs = annoWrap.select('.sel-anno-wrap').selectAll('div.structure-anno').data(stackedData).join('div')
       .classed('structure-anno', true);
+
+    renderAnnotationBoxes(structAnnoDivs);
     
-    structAnnoDivs.filter(f=> f.has_unkown === 'TRUE').classed('question', true);
-
-    const annoTime = structAnnoDivs.selectAll('text.time').data((d) => [d]).join('text').classed('time', true)
-      .text((d) => d.video_time);
-    const annoTypeHeader = structAnnoDivs.selectAll('h6').data((d) => [d]).join('h6');
-
-    const annoHeadSpan = annoTypeHeader.selectAll('span').data((d) => [d]).join('span').text((d) => d.annotation_type);
-    annoHeadSpan.classed('badge badge-secondary', true);
-    annoTypeHeader.filter((f) => f.has_unkown === 'TRUE').selectAll('i.fas').data((d) => [d]).join('i')
-      .classed('fas fa-exclamation-circle', true);
-    // annoHeadSpan.style('background-color', (d)=> annoType.filter(f=> f.type === d.annotation_type)[0].color)
-    annoHeadSpan.style('background-color', (d) => 'gray');
-    const annoText = structAnnoDivs.selectAll('text.anno-text').data((d) => [d]).join('text').text((d) => d.text_description)
-      .classed('anno-text', true);
-    const annoRef = structAnnoDivs.filter((f) => f.ref != '' && f.ref != 'na').selectAll('text.ref').data((d) => [d]).join('text')
-      .classed('ref', true)
-      .text((d) => d.ref);
-    const annoLink = structAnnoDivs.filter((f) => f.url != '' && f.url != 'na').selectAll('a.link').data((d) => [d]).join('a')
-      .classed('link', true)
-      .text((d) => d.url);
-    annoLink.attr('href', (d) => d.url);
-    annoLink.attr('target', '_blank');
   }
 
   const annoDiv = annoWrap.select('.anno-wrap').selectAll('div.anno').data(data).join('div')
     .classed('anno', true);
-  annoDiv.filter(f=> f.has_unkown === 'TRUE').classed('question', true);
 
-  const annoTime = annoDiv.selectAll('text.time').data((d) => [d]).join('text').classed('time', true)
-    .text((d) => d.video_time);
-  const annoTypeHeader = annoDiv.selectAll('h6').data((d) => [d]).join('h6');
-
-  const annoHeadSpan = annoTypeHeader.selectAll('span').data((d) => [d]).join('span').text((d) => d.annotation_type);
-  annoHeadSpan.classed('badge badge-secondary', true);
-  // annoHeadSpan.style('background-color', (d)=> annoType.filter(f=> f.type === d.annotation_type)[0].color)
-  annoHeadSpan.style('background-color', (d) => 'gray');
-  annoTypeHeader.filter((f) => f.has_unkown === 'TRUE').selectAll('i.fas').data((d) => [d]).join('i')
-    .classed('fas fa-exclamation-circle', true);
-  const annoText = annoDiv.selectAll('text.anno-text').data((d) => [d]).join('text').text((d) => d.text_description)
-    .classed('anno-text', true);
-
-  const annoRef = annoDiv.filter((f) => f.ref != '' && f.ref != 'na').selectAll('text.ref').data((d) => [d]).join('text')
-    .classed('ref', true)
-    .text((d) => d.ref);
-
-  const annoLink = annoDiv.filter((f) => f.url != '' && f.url != 'na').selectAll('a.link').data((d) => [d]).join('a')
-    .classed('link', true)
-    .text((d) => d.url);
-  annoLink.attr('href', (d) => d.url);
-  annoLink.attr('target', '_blank');
+  renderAnnotationBoxes(annoDiv);
 
   d3.select('.annotation-wrap').selectAll('rect').filter((f) => {
     const currentData = filteredAnno.map((m) => m.text_description);

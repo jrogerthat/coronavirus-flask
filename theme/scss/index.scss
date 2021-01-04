@@ -253,7 +253,7 @@ margin-top:10px;
    border-left: 1px solid dodgerblue !important;
  }
 
- .reference .fa-scroll path{
+ .fa-book-open path{
    fill: dodgerblue !important;
  }
 
@@ -374,8 +374,8 @@ margin-top:10px;
   -ms-transform: translate(-50%);
   transform: translate(-50%);
 }
-.fa-exclamation-circle{
-  margin-left:20px;
+.fa-exclamation-circle, .fa-book-open{
+  margin-left:10px;
   float:right;
 }
 .fa-exclamation-circle path{

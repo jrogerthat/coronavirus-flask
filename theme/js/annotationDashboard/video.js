@@ -232,7 +232,7 @@ export async function mouseClickVideo(coord, video) {
       // NEED TO CLEAR THIS UP - LOOKS LIKE YOU ARE REPEATING WORK IN UPDATE COMMENT SIDEBAR AND DRAW COMMETN BOXES
       updateCommentSidebar(commentData, structureSelected.comments);
       updateAnnotationSidebar(annotationData[annotationData.length - 1], structureSelected.annotations, null);
-      annoWrap.select('.top').append('h6').text('   Spike Protein Annotations: ');
+      annoWrap.select('.top').append('h6').text('   Associated Annotations: ');
 
       renderStructureKnowns(topCommentWrap);
 
