@@ -1,8 +1,10 @@
 import * as d3 from 'd3';
 import { select } from 'd3';
 import firebase from 'firebase/app';
+import { annotationData } from '..';
 import { currentUser, dataKeeper, formatVideoTime } from '../dataManager';
 import { checkDatabase, userLoggedIn, userLogin } from '../firebaseUtil';
+import { updateAnnotationSidebar } from './annotationBar';
 import { colorDictionary, structureSelected, doodleKeeper } from './imageDataUtil';
 import { commentClicked } from './video';
 
@@ -721,6 +723,7 @@ export function formatToComment(div, startingTags) {
       clearRightSidebar();
       renderCommentDisplayStructure();
       checkDatabase([updateCommentSidebar]);
+      updateAnnotationSidebar(annotationData[annotationData.length - 1]);
     } else {
       window.alert('Please add a comment first');
     }

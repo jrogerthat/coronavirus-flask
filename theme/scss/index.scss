@@ -73,8 +73,19 @@ div{
   display:inline-block;
   //width:300px;
   position:absolute;
-  left:10%;
+  left:3%;
   top:10px;
+}
+#toggle-sort-ref-wrap{
+  display:inline-block;
+  //width:300px;
+  position:absolute;
+  left:20%;
+  top:10px;
+}
+
+#toggle-sort-ref-wrap svg{
+ margin-left: 0 !important;
 }
 
 #toggle-show-wrap{
@@ -85,14 +96,14 @@ div{
   top:10px;
 }
 
-#toggle-show-wrap div, #toggle-sort-wrap div{
+#toggle-show-wrap div, #toggle-sort-wrap div, #toggle-sort-ref-wrap di{
   margin-left:90px;
   display: inline;
  // text-align: end;
   width:190px;
 }
 
-#toggle-show-wrap .label, #toggle-sort-wrap .label{
+#toggle-show-wrap .label, #toggle-sort-wrap .label, #toggle-sort-ref-wrap .label{
   position:absolute;
   left:55px;
   top:6px;

@@ -22,24 +22,22 @@ export function toggleSort(event) {
     const sortedStructureData = annotationData[annotationData.length - 1].filter((f) => f.has_unkown === 'TRUE').concat(annotationData[annotationData.length - 1].filter((f) => f.has_unkown === 'FALSE'));
     updateAnnotationSidebar(annotationData[annotationData.length - 1], sortedStructureData, null);
 
-    // let stackedData = structureData.filter(f=> f.has_unkown == "TRUE").concat(structureData.filter(f=> f.has_unkown == "FALSE"));
-
-    // UNCOMMENT AFTER
-    //   let nestReplies = formatCommentData(dataKeeper[dataKeeper.length -1], null);
-
-    //   let test = nestReplies.filter((f)=> f.comment.includes('?'));
-
-    //   let commentWrap = d3.select('#comment-wrap').select('.top');
-    //   let genComWrap = d3.select('#comment-wrap').select('.general-comm-wrap');
-    //   let selectedComWrap = d3.select('#comment-wrap').select('.selected-comm-wrap');
-    //   clearRightSidebar();
-
-    //   drawCommentBoxes(test, selectedComWrap);
-    //   drawCommentBoxes(nestReplies, genComWrap);
   } else {
     updateAnnotationSidebar(annotationData[annotationData.length - 1], null, null);
   }
 }
+
+export function toggleSortRef(event) {
+  if (event.target.checked) {
+    const sortedStructureData = annotationData[annotationData.length - 1].filter((f) => f.ref != '' && f.ref != 'na').concat(annotationData[annotationData.length - 1].filter((f) => f.ref === '' && f.ref === 'na'));
+    updateAnnotationSidebar(annotationData[annotationData.length - 1], sortedStructureData, null);
+
+  } else {
+    updateAnnotationSidebar(annotationData[annotationData.length - 1], null, null);
+  }
+}
+
+
 export function renderIssueButton(wrap) {
   const bugLink = wrap.append('a');
   bugLink.attr('href', 'https://github.com/jrogerthat/coronavirus_flask/issues');
@@ -52,7 +50,6 @@ export function renderUser(userData) {
   const div = d3.select('#top-bar').select('#user');
   div.selectAll('text.user_name').data([displayName]).join('text').classed('user_name', true)
     .text(`  ${displayName}`);
-  // renderIssueButton(div);
 }
 
 export function addStructureLabelFromButton(structure) {
@@ -82,7 +79,6 @@ export function goBackButton() {
 
 export function addCommentButton() {
   const button = d3.select('#top-bar').select('.add-comment').select('button');
-  // console.log('userrrr', userLoggedIn)
 
   if (userLoggedIn.loggedInBool === false) {
     button.text('Log in to comment');
