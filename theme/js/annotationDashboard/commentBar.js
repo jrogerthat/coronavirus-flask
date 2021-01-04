@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { select } from 'd3';
 import firebase from 'firebase/app';
 import { currentUser, dataKeeper, formatVideoTime } from '../dataManager';
-import { checkDatabase, userLoggedIn } from '../firebaseUtil';
+import { checkDatabase, userLoggedIn, userLogin } from '../firebaseUtil';
 import { colorDictionary, structureSelected, doodleKeeper } from './imageDataUtil';
 import { commentClicked } from './video';
 
@@ -673,14 +673,18 @@ export function formatToComment(div, startingTags) {
   const submit = div.append('button').attr('id', 'comment-submit-button').text('Add').classed('btn btn-secondary', true);
   const commentType = 'comments';
 
-  submit.on('click', async (event) => {
-   
-    const user = currentUser[currentUser.length - 1];
-
-    const context = canvas.getContext('2d');
-    const videoDim = document.getElementById('video').getBoundingClientRect();
+  submit.on('click', (event) => {
 
     event.stopPropagation();
+
+    console.log('button clicked');
+   
+    const user = userLoggedIn;
+
+    // const context = canvas.getContext('2d');
+    // const videoDim = document.getElementById('video').getBoundingClientRect();
+
+    
 
     if (d3.select('#text-area-id').node().value != '') {
       const tags = d3.select('.tag-wrap').selectAll('.badge');
@@ -713,6 +717,10 @@ export function formatToComment(div, startingTags) {
       }
 
       d3.select('.add-comment').select('button').text('Add Comment');
+
+      clearRightSidebar();
+      renderCommentDisplayStructure();
+      checkDatabase([updateCommentSidebar]);
     } else {
       window.alert('Please add a comment first');
     }
