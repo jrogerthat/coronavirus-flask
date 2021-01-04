@@ -72,8 +72,6 @@ function renderAnnotationBoxes(divs){
   }
 });
 
-
-
     const annoLink = divs.filter((f) => f.url != '' && f.url != 'na').selectAll('a.link').data((d) => [d]).join('a')
       .classed('link', true)
       .text((d) => d.url);
