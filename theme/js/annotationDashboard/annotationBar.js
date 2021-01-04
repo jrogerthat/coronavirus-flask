@@ -30,6 +30,8 @@ export async function updateAnnotationSidebar(data, stackedData) {
   const annoWrap = d3.select('#left-sidebar');
   clearAnnotationSidebar();
 
+  console.log('stacleked data',stackedData)
+
   if (stackedData != null) {
     const structAnnoDivs = annoWrap.select('.sel-anno-wrap').selectAll('div.structure-anno').data(stackedData).join('div')
       .classed('structure-anno', true);
@@ -61,7 +63,7 @@ export async function updateAnnotationSidebar(data, stackedData) {
   const annoDiv = annoWrap.select('.anno-wrap').selectAll('div.anno').data(data).join('div')
     .classed('anno', true);
   annoDiv.filter(f=> f.has_unkown === 'TRUE').classed('question', true);
-  
+
   const annoTime = annoDiv.selectAll('text.time').data((d) => [d]).join('text').classed('time', true)
     .text((d) => d.video_time);
   const annoTypeHeader = annoDiv.selectAll('h6').data((d) => [d]).join('h6');

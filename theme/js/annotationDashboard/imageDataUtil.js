@@ -22,18 +22,17 @@ export function structureSelectedToggle(datum) {
 export const doodleKeeper = [];
 
 export const colorDictionary = {
-  blue: { code: [0, 0, 255], structure: ['Cell Membrane'] },
-  purple: { code: [102, 0, 204], structure: ['ACE2'] },
-  magenta: { code: [255, 0, 255], structure: ['ACE2'] },
-  red: { code: [255, 0, 0], structure: ['Envelope protein, e protein'] },
-  green: { code: [0, 255, 0], structure: ['Spike Protein', 's protein'] },
-  // 'RNA orange':{'code':[255,128,0], 'structure': ['RNA']},
-  orange: { code: [255, 128, 0], structure: ['Furin, RNA'] },
-  yellow: { code: [255, 255, 0], structure: ['Membrane Protein'] },
-  aqua: { code: [0, 255, 255], structure: ['Furin'] },
-  teal: { code: [10, 160, 140], structure: ['Spike Protein', 's protein'] },
-  'light gray': { code: [200, 200, 200], structure: ['Virus Membrane'] },
-  unknown: { code: [200, 200, 200], structure: ['Spike Protein', 's protein'] },
+  blue: { code: [0, 0, 255], structure: ['Cell Membrane'], other_names:['Cell Membrane', 'plasma membrane'] },
+  purple: { code: [102, 0, 204], structure: ['ACE2'], other_names:['ACE2'] },
+  magenta: { code: [255, 0, 255], structure: ['ACE2'], other_names:['ACE2'] },
+  red: { code: [255, 0, 0], structure: ['Envelope protein'], other_names:['Envelope protein', 'e protein'] },
+  green: { code: [0, 255, 0], structure: ['Spike Protein'], other_names:['Spike Protein', 's protein', 'spike', 'spikes'] },
+  orange: { code: [255, 128, 0], structure: ['RNA', 'Furin'], other_names:[] },
+  yellow: { code: [255, 255, 0], structure: ['Membrane Protein'], other_names:['Membrane Protein','membrane'] },
+  aqua: { code: [0, 255, 255], structure: ['Furin'], other_names:['Furin'] },
+  teal: { code: [10, 160, 140], structure: ['Spike Protein'], other_names:['Spike Protein', 's protein', 'spike', 'spikes'] },
+  'light gray': { code: [200, 200, 200], structure: ['Virus Membrane'], other_names:['Virus Membrane'] },
+  unknown: { code: [200, 200, 200], structure: ['Spike Protein'], other_names:['Spike Protein', 's protein', 'spike', 'spikes'] },
 };
 
 export const getColorIndicesForCoord = (x, y, width) => {

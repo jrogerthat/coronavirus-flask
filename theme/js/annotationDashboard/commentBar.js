@@ -14,7 +14,7 @@ export function clearRightSidebar() {
 }
 
 export function updateCommentSidebar(dbRef) {
-  console.log('updateCommentSidebar', userLoggedIn);
+ 
   const wrap = d3.select('#right-sidebar').select('#comment-wrap').select('.general-comm-wrap');
   // clearRightSidebar();
   // renderCommentDisplayStructure();
@@ -49,7 +49,7 @@ function replyInputBox(d, i, n, user) {
 
   submit.on('click', (event) => {
     event.stopPropagation();// user, currentTime, mark, tag, coords, replyTo, quote
-    console.log(userLoggedIn)
+
     const dataPush = formatComment2Send(userLoggedIn, d3.select('video').node().currentTime, 'none', 'none', null, d.key, null);
     const ref = firebase.database().ref('comments');
     d3.select(n.parentNode.parentNode).select('.reply-space').select('.text-input-sidebar').remove();
@@ -75,14 +75,6 @@ export function formatCommentData(dbRef) {
 
   return nestReplies;
 
-  // }else{
-
-  //     let replyData = unresolved.filter(f=> (f.reply === true));
-  //     let nestReplies = annotations.map((d, i, n)=>{
-  //     return recurse(d, replyData, 0);
-  //     });
-  //     return nestReplies;
-  // }
 }
 
 export function highlightCommentBoxes(timeRange) {
@@ -191,11 +183,13 @@ export function drawCommentBoxes(nestedData, wrap) {
 
   if (userLoggedIn.loggedInBool) {
     // RESOLVE
-    const resolve = memoDivs.filter((f) => f.uid === currentUser[currentUser.length - 1].uid).selectAll('.resolve-span').data((d) => [d]).join('span')
+    const resolve = memoDivs.filter((f) => f.uid === userLoggedIn.uid).selectAll('.resolve-span').data((d) => [d]).join('span')
       .classed('resolve-span', true)
       .text('Resolve ');
+
     resolve.selectAll('.resolve').data((d) => [d]).join('i').classed('resolve', true)
       .classed('resolve fas fa-check', true);
+
     resolve.on('click', (d) => {
       db.ref(`comments/${d.key}/resolved`).set('true');
     });
@@ -244,6 +238,19 @@ export function drawCommentBoxes(nestedData, wrap) {
   questionMemos.classed('question', true);
   const qs = questionMemos.selectAll('div.question').data((d) => [d]).join('div').classed('question', true);
   qs.selectAll('i.fas.question').data((d) => [d]).join('i').classed('fas question fa-exclamation-circle', true);
+
+  const qreply = d3.selectAll('.reply-memo').filter(f=> f.comment.includes('?')).classed('question', true);
+  qreply.selectAll('div.question').data((d) => [d]).join('div').classed('question', true);
+  qreply.selectAll('i.fas.question').data((d) => [d]).join('i').classed('fas question fa-exclamation-circle', true);
+
+  const refMemos = memoDivs.filter(f=> {
+    return f.comment.includes('http') || f.comment.includes('et al')}).classed('reference', true);
+  refMemos.selectAll('i.fas.question').data((d) => [d]).join('i').classed('fas fa-scroll', true);
+  //<i class="fas fa-scroll"></i>
+  
+  const refReply = d3.selectAll('.reply-memo').filter(f=> f.comment.includes('http') || f.comment.includes('et al')).classed('reference', true);
+  refReply.selectAll('i.fas.question').data((d) => [d]).join('i').classed('fas fa-scroll', true);
+  
 }
 
 export function recurseDraw(selectDiv) {
@@ -627,7 +634,7 @@ export function renderCommentDisplayStructure() {
 }
 
 export function formatComment2Send(user, currentTime, mark, tag, coords, replyTo, quote) {
-  console.log('user', user);
+ 
   return {
     uid: user.uid,
     displayName: user.displayName,
@@ -667,7 +674,7 @@ export function formatToComment(div, startingTags) {
   const commentType = 'comments';
 
   submit.on('click', async (event) => {
-    console.log('clicked', event)
+   
     const user = currentUser[currentUser.length - 1];
 
     const context = canvas.getContext('2d');
@@ -735,7 +742,7 @@ export function formatTimeControl(div) {
 function replyRender(replyDivs) {
   const db = firebase.database();
 
-  console.log('reply',replyDivs)
+ 
 
   replyDivs.selectAll('.name').data((d) => [d]).join('span').classed('name', true)
     .selectAll('text')
@@ -767,7 +774,9 @@ function replyRender(replyDivs) {
     reply.selectAll('.reply').data((d) => [d]).join('i').classed('far fa-comment-dots reply', true)
       .style('float', 'right');
 
-    const resolve = replyDivs.selectAll('.resolve-span').data((d) => [d]).join('span').classed('resolve-span', true)
+    const resolve = replyDivs.filter(f =>{
+      return f.displayName === userLoggedIn.displayName;
+    }).selectAll('.resolve-span').data((d) => [d]).join('span').classed('resolve-span', true)
       .text('Resolve ');
     resolve.selectAll('.resolve').data((d) => [d]).join('i').classed('resolve', true)
       .classed('resolve fas fa-check', true);// .text(d=> `${d.displayName}:`);
@@ -782,7 +791,7 @@ function replyRender(replyDivs) {
       const e = reply.nodes();
       const i = e.indexOf(this);
 
-      console.log('d in reply', d);
+     
 
       if (!d.replyBool) {
         d.replyBool = true;

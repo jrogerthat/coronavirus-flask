@@ -124,17 +124,19 @@ export function togglePlay() {
 
 export async function mouseMoveVideo(coord, video) {
   if (video.playing) {
-
+      console.log('video playing');
   } else if (structureSelected.selected === true || video.currentTime >= endDrawTime) {
-
+      console.log('struct selected');
   } else {
     const snip = getCoordColor(coord);
 
     if (snip != currentColorCodes[currentColorCodes.length - 1] && !video.playing && snip != 'black' && snip != 'unknown') {
       currentColorCodes.push(snip);
       parseArray(snip);
-      const structFromDict = snip === 'orange' && video.currentTime < 17 ? colorDictionary[snip].structure[1].toUpperCase() : colorDictionary[snip].structure[0].toUpperCase();
-      const structureData = annotationData[annotationData.length - 1].filter((f) => f.associated_structures.split(', ').map((m) => m.toUpperCase()).indexOf(structFromDict) > -1);
+      const structFromDict = (snip === 'orange' && video.currentTime > 16) ? colorDictionary[snip].structure[1].toUpperCase() : colorDictionary[snip].structure[0].toUpperCase();
+      const structureData = annotationData[annotationData.length - 1].filter((f) => {
+        //console.log('f in mouseover', f);
+        return f.associated_structures.split(', ').map((m) => m.toUpperCase()).indexOf(structFromDict) > -1});
       structureTooltip(structureData, coord, snip, true);
     } else if (snip === 'black') {
       d3.select('.tooltip').style('opacity', 0);
@@ -175,16 +177,45 @@ export async function mouseClickVideo(coord, video) {
       structureSelectedToggle(colorDictionary[snip].structure[0]);
       parseArray(snip);
 
+      console.log('snip', snip);
+
       const nestReplies = formatCommentData({ ...commentData }, null);
 
       structureSelected.comments = nestReplies.filter((f) => {
-        if (colorDictionary[snip].structure[1]) {
-          return f.comment.toUpperCase().includes(colorDictionary[snip].structure[0].toUpperCase()) || f.comment.toUpperCase().includes(colorDictionary[snip].structure[1].toUpperCase);
+        if (snip === 'orange') { //it  could be furin or rna - check time
+          if(video.currentTime < 15){
+            let struct = colorDictionary[snip].structure[0].toUpperCase();
+            let reply = f.replyKeeper.filter(r=> {
+              r.comment.toUpperCase().includes(struct);
+              return rTest.length > 0;
+            });
+            
+            return f.comment.toUpperCase().includes(colorDictionary).includes(struct) || reply.length > 0;
+          }else{
+            let struct = colorDictionary[snip].structure[1].toUpperCase();
+            return f.comment.toUpperCase().includes(colorDictionary).includes(struct);
+          }
+        }else{
+          let tags = f.tags.split(',').filter(m=> {
+            return colorDictionary[snip].other_names.map(on=> on.toUpperCase()).indexOf(m.toUpperCase()) > -1;
+          });
+          let test = colorDictionary[snip].other_names.filter(n=> f.comment.toUpperCase().includes(n.toUpperCase()));
+            let reply = f.replyKeeper.filter(r=> {
+              let rTest = colorDictionary[snip].other_names.filter(n=> r.comment.toUpperCase().includes(n.toUpperCase()));
+              return rTest.length > 0;
+            });
+          return test.length > 0 || reply.length > 0 || tags.length > 0;
         }
-        return f.comment.includes(colorDictionary[snip].structure[0]);
+       
       });
 
-      const structureAnnotations = annotationData[annotationData.length - 1].filter((f) => f.associated_structures.split(', ').map((m) => m.toUpperCase()).indexOf(colorDictionary[snip].structure[0].toUpperCase()) > -1);
+      const structureAnnotations = annotationData[annotationData.length - 1].filter((f) => {
+        let structsAnno = f.associated_structures.split(', ').filter((m) => {
+          let otherNames = colorDictionary[snip].other_names.map(on=> on.toUpperCase()).indexOf(m.toUpperCase());
+          return otherNames > -1;
+        });
+        return structsAnno.length > 0;
+      });
 
       structureSelected.annotations = structureAnnotations.filter((f) => f.has_unkown === 'TRUE').concat(structureAnnotations.filter((f) => f.has_unkown === 'FALSE'));
 

@@ -115,7 +115,7 @@ div{
     padding: 1rem 0 0 0;
     grid-area: side1;
     overflow-y: scroll;
-    max-width: 300px;
+    max-width: 320px;
 }
 
 #left-sidebar .anno-wrap{
@@ -240,9 +240,24 @@ margin-top:10px;
   background-color: #BBBBBB;
  }
 
- .memo.question, .anno.question, .structure-anno.question{
+ .memo.question, .anno.question, .structure-anno.question, .reply-memo.question{
   border: 1px solid red !important;
  }
+
+ .memo.reference, .anno.reference, .structure-anno.reference{
+  border: 1px solid dodgerblue !important;
+ }
+
+ .reply-memo.reference{
+   border-top: 1px solid dodgerblue !important;
+   border-left: 1px solid dodgerblue !important;
+ }
+
+ .reference .fa-scroll path{
+   fill: dodgerblue !important;
+ }
+
+
  .memo .tag-span{
    display:inline-block;
  }
@@ -744,11 +759,11 @@ toggle
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+  background-color: #737373; // #2196F3;
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
+  box-shadow: 0 0 1px #737373; // #2196F3;
 }
 
 input:checked + .slider:before {
