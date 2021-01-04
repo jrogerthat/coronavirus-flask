@@ -273,9 +273,9 @@ function structureTooltip(structureData, coord, snip, hoverBool) {
       .style('position', 'absolute')
       .style('opacity', 1)
       .html(`<h4>${colorDictionary[snip].structure[0]}</h4>
-    <span class="badge badge-pill badge-info"><h7>${structureData.length}</h7></span> annotations for this structure. <br>
+    <span class="badge badge-pill badge-dark">${structureData.length}</span> annotations for this structure. <br>
     <span class="badge badge-pill badge-danger">${question}</span> Questions. <br>
-    <span class="badge badge-pill badge-warning">${refs}</span> Refs. <br>
+    <span class="badge badge-pill badge-primary">${refs}</span> Refs. <br>
     <br>
     <h7>Click Structure for more Info</h7>
     `)

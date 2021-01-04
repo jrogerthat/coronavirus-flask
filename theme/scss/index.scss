@@ -84,8 +84,9 @@ div{
   top:10px;
 }
 
-#toggle-sort-ref-wrap svg{
+#toggle-sort-ref-wrap .label .fa-exclamation-circle{
  margin-left: 0 !important;
+ padding:0;
 }
 
 #toggle-show-wrap{
@@ -214,6 +215,10 @@ margin-top:10px;
   background-color: red;
 }
 
+.selected-comm-wrap h7{
+  margin:18px;
+}
+
 #right-sidebar{
     position:fixed;
     right:0px;
@@ -221,7 +226,7 @@ margin-top:10px;
     height:calc(100vh - 70px);
     grid-area: side2;
     overflow-y: scroll;
-    max-width:300px;
+    max-width:350px;
 }
 #comment-wrap{
   grid-area: vid;
@@ -253,6 +258,10 @@ margin-top:10px;
 
  .memo.question, .anno.question, .structure-anno.question, .reply-memo.question{
   border: 1px solid red !important;
+ }
+
+ .reply .fa-comment-dots path{
+   fill:#4d4949;
  }
 
  .memo.reference, .anno.reference, .structure-anno.reference{
@@ -380,12 +389,14 @@ margin-top:10px;
 }
 .add-comment-structure{
   position: absolute;
-  left: 50%;
+  left: 45%;
   top:126px;
   -ms-transform: translate(-50%);
   transform: translate(-50%);
 }
-.fa-exclamation-circle, .fa-book-open{
+.anno .fa-exclamation-circle, .anno .fa-book-open,
+.structure-anno .fa-exclamation-circle, .structure-anno .fa-book-open,
+.memo .fa-exclamation-circle, .memo .fa-book-open{
   margin-left:10px;
   float:right;
 }
@@ -485,6 +496,10 @@ video::-webkit-media-controls {
 
 .togg-wrap{
  margin: auto;
+}
+
+.top h6{
+  margin-left: 18px;
 }
 
 .dropdown-content {

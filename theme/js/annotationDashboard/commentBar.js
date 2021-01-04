@@ -198,7 +198,7 @@ export function drawCommentBoxes(nestedData, wrap) {
     // REPLY
     const reply = memoDivs.selectAll('.reply-span').data((d) => [d]).join('span').classed('reply-span', true)
       .text('Reply ');
-    reply.selectAll('.reply').data((d) => [d]).join('i').classed('far fa-comment-dots fa-lg reply', true);// .style('float', 'right')//.text('Reply');
+    reply.selectAll('.reply').data((d) => [d]).join('i').classed('fas fa-comment-dots fa-lg reply', true);// .style('float', 'right')//.text('Reply');
 
     reply.on('click', function (event, d) {
       event.stopPropagation();
@@ -257,7 +257,7 @@ export function drawCommentBoxes(nestedData, wrap) {
 
 export function recurseDraw(selectDiv) {
   const replyDivs = selectDiv.selectAll('.reply-memo').data((d) => d.replyKeeper).join('div').classed('reply-memo', true);
-  replyDivs.style('margin-left', (d) => `${d.level * 10}px`);
+  replyDivs.style('margin-left', (d) => `${d.level * 3}px`);
 
   replyDivs.each((d, i, n) => {
     replyRender(d3.select(n[i]));
@@ -281,9 +281,9 @@ export function renderStructureKnowns(topCommentWrap) {
 
   topCommentWrap.append('div').classed('found-info', true)
     .html(`<h4>${structureSelected.structure}</h4>
-    <span class="badge badge-pill badge-info"><h7>${structureSelected.annotations.length}</h7></span> annotations for this structure. <br>
+    <span class="badge badge-pill badge-dark">${structureSelected.annotations.length}</span> annotations for this structure. <br>
     <span class="badge badge-pill badge-danger">${questions}</span> Questions. <br>
-    <span class="badge badge-pill badge-warning">${refs}</span> Refs. <br>
+    <span class="badge badge-pill badge-primary">${refs}</span> Refs. <br>
     <br>
     `);
 
@@ -683,11 +683,6 @@ export function formatToComment(div, startingTags) {
    
     const user = userLoggedIn;
 
-    // const context = canvas.getContext('2d');
-    // const videoDim = document.getElementById('video').getBoundingClientRect();
-
-    
-
     if (d3.select('#text-area-id').node().value != '') {
       const tags = d3.select('.tag-wrap').selectAll('.badge');
       const { currentTime } = document.getElementById('video');
@@ -753,18 +748,18 @@ export function formatTimeControl(div) {
 function replyRender(replyDivs) {
   const db = firebase.database();
 
- 
-
   replyDivs.selectAll('.name').data((d) => [d]).join('span').classed('name', true)
     .selectAll('text')
     .data((d) => [d])
     .join('text')
     .text((d) => `${d.displayName} replied:`);
+
   replyDivs.selectAll('.comment').data((d) => [d]).join('span').classed('comment', true)
     .selectAll('text')
     .data((d) => [d])
     .join('text')
     .text((d) => d.comment);
+
   replyDivs.selectAll('.post-time').data((d) => [d]).join('span').classed('post-time', true)
     .selectAll('text')
     .data((d) => [d])
